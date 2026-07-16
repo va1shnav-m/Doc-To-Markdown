@@ -23,7 +23,13 @@ __pycache__/
 
 # Temporary files
 temp/
+temp_chunks/
 tmp/
+
+# Generated output
+assets/
+output/
+caption_cache.json
 
 # OS files
 .DS_Store
