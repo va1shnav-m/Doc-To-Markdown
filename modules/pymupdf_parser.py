@@ -96,7 +96,7 @@ def parse_document(
                 f.write(image_bytes)
 
             markdown.append(
-                f"![Image](assets/{image_filename})\n\n"
+                    "<!-- image -->\n\n"
             )
 
     doc.close()

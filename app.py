@@ -217,7 +217,7 @@ if uploaded_file is not None:
                     f"{chunk_end - chunk_start:.2f} sec"
                 )
 
-                total_images += result["image_count"]
+                
 
                 progress.progress(
                     (index + 1) / total_chunks
@@ -234,6 +234,33 @@ if uploaded_file is not None:
             markdown_file = combine_markdowns(
                 OUTPUT_DIR
             )
+
+        else:
+
+            result = parse_document(
+                input_path=converted_path,
+                output_dir=OUTPUT_DIR,
+                assets_dir=ASSETS_DIR,
+            )
+
+            markdown_file = result["markdown"]
+
+            total_images = result["image_count"]
+
+            parsing_end = time.perf_counter()
+
+            st.info(
+                f"Parsing Time : {parsing_end - parsing_start:.2f} seconds"
+            )
+
+            st.success("Document parsing completed.")
+
+            st.metric(
+                "Images Extracted",
+                total_images
+        )
+
+        progress.empty()    
 
         # ----------------------------
         # RapidOCR
@@ -342,7 +369,7 @@ if uploaded_file is not None:
         )
 
         st.write(
-            f"🖼️ Qwen : {caption_end-caption_start:.2f} sec"
+            f"🖼️ SmolVLM : {caption_end-caption_start:.2f} sec"
         )
 
         st.write(

@@ -42,6 +42,8 @@ def parse_document(input_path, output_dir, assets_dir, page_name=None):
 
     pipeline_options.generate_page_images = False
 
+    
+
     # ----------------------------------------
     # Create Converter
     # ----------------------------------------

@@ -2,7 +2,7 @@ from pathlib import Path
 import fitz
 
 
-# Images covering more than 20% of the page
+# Images covering more than 10% of the page
 # are considered important.
 IMAGE_AREA_THRESHOLD = 0.10
 
@@ -43,10 +43,17 @@ def analyze_pdf(pdf_path):
 
             table_count = 0
 
+        fallback_table = likely_has_table(page)
+
         has_table = (
             table_count > 0
-            or likely_has_table(page)
+            or fallback_table
         )
+
+        if table_count == 0 and fallback_table:
+            table_count = 1
+
+
         # ----------------------------------
         # Detect Images
         # ----------------------------------
@@ -140,6 +147,7 @@ def analyze_pdf(pdf_path):
 def likely_has_table(page):
     """
     Fallback heuristic for borderless tables.
+    Detects row-column structures instead of simple indentation.
     """
 
     blocks = page.get_text("blocks")
@@ -147,17 +155,27 @@ def likely_has_table(page):
     if len(blocks) < 5:
         return False
 
-    # Count unique left X positions
-    x_positions = []
+    # Group blocks by Y position (same row)
+    rows = {}
 
     for block in blocks:
-        x = round(block[0], 1)
-        x_positions.append(x)
+        x0, y0 = round(block[0], 1), round(block[1], 1)
 
-    unique_x = len(set(x_positions))
+        # Merge nearby Y values into the same row
+        row_key = round(y0 / 5) * 5
 
-    # Many repeated aligned blocks usually indicate columns
-    if unique_x <= len(blocks) * 0.6:
-        return True
+        rows.setdefault(row_key, []).append(x0)
 
-    return False
+    row_like_count = 0
+
+    for xs in rows.values():
+
+        # Ignore duplicate X values in a row
+        unique_x = len(set(xs))
+
+        # A table row usually has multiple columns
+        if unique_x >= 3:
+            row_like_count += 1
+
+    # Require several rows with multiple columns
+    return row_like_count >= 3

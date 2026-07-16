@@ -61,39 +61,7 @@ def merge_markdown(
 
         image_name = image_path.name
 
-        replacement = []
-
-        # -------------------------------------------------
-        # Figure Title
-        # -------------------------------------------------
-
-        replacement.append(f"### Figure {figure_number}")
-        replacement.append("")
-
-        # -------------------------------------------------
-        # Image
-        # -------------------------------------------------
-
-        replacement.append(
-            f"![{image_name}](assets/{image_name})"
-        )
-
-        # -------------------------------------------------
-        # Caption
-        # -------------------------------------------------
-
-        caption = captions.get(image_name, "")
-
-        if caption.strip():
-
-            replacement.append("")
-            replacement.append("> **Image Description**")
-            replacement.append(">")
-            replacement.append(f"> {caption}")
-
-        # -------------------------------------------------
-        # OCR
-        # -------------------------------------------------
+        caption = captions.get(image_name, "").strip()
 
         ocr = ocr_results.get(
             image_name,
@@ -104,6 +72,33 @@ def merge_markdown(
 
         ocr_text = ocr["text"].strip()
 
+        # Skip images with no useful information
+        if not caption and not ocr_text:
+
+            markdown = markdown.replace(
+                "<!-- image -->",
+                "",
+                1
+            )
+
+            continue
+
+        replacement = []
+
+        replacement.append(f"### Figure {figure_number}")
+        replacement.append("")
+
+        replacement.append(
+            f"![{image_name}](assets/{image_name})"
+        )
+
+        if caption:
+
+            replacement.append("")
+            replacement.append("> **Image Description**")
+            replacement.append(">")
+            replacement.append(f"> {caption}")
+
         if ocr_text:
 
             replacement.append("")
@@ -111,7 +106,6 @@ def merge_markdown(
             replacement.append(">")
 
             for line in ocr_text.splitlines():
-
                 replacement.append(f"> {line}")
 
         replacement.append("")

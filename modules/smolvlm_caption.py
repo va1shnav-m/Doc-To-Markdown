@@ -96,44 +96,23 @@ def resize_image(image_path):
 def generate_captions(assets_dir, ocr_results):
 
     prompt = """
-You are generating captions for images extracted from software engineering and technical documents.
+Describe this image in 1-3 concise sentences.
 
-Generate one concise caption consisting of one or two complete sentences.
+Focus only on important technical content such as:
+- diagrams
+- flowcharts
+- architecture
+- UI/screenshots
+- tables
+- graphs
+- code
+- forms
 
-Start the caption immediately with the figure type or the main subject.
+Mention the main purpose and key components. Do not describe colors, styling, or unnecessary visual details.
 
-Do NOT start with:
-- This image
-- The image
-- This figure
-- Figure
-- It appears to be
-- It looks like
-- There is
-- This screenshot
+If the image contains no meaningful technical information (logo, icon, decorative element, blank image), respond exactly with:
 
-Instead begin directly with examples like:
-- Architecture diagram illustrating...
-- Flowchart describing...
-- UI screenshot displaying...
-- ER diagram showing...
-- Sequence diagram illustrating...
-- Bar chart comparing...
-- Database schema containing...
-
-Include:
-- Important visible text
-- Technical terminology
-- Labels
-- Relationships
-- Components
-- Error messages
-- UI elements
-- Numbers when relevant
-
-Only describe what is visible.
-Do not speculate.
-Return only the caption.
+SKIP
 """
 
     assets_dir = Path(assets_dir)
