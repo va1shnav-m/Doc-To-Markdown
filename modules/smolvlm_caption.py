@@ -97,23 +97,10 @@ def generate_captions(assets_dir, ocr_results):
 
     prompt = """
 Describe this image in 1-3 concise sentences.
-
 Focus only on important technical content such as:
-- diagrams
-- flowcharts
-- architecture
-- UI/screenshots
-- tables
-- graphs
-- code
-- forms
-
+- diagrams,flowcharts, architecture, UI/screenshots, tables, graph, code, forms etc.
 Mention the main purpose and key components. Do not describe colors, styling, or unnecessary visual details.
-
-If the image contains no meaningful technical information (logo, icon, decorative element, blank image), respond exactly with:
-
-SKIP
-"""
+If the image contains no meaningful technical information (logo, icon, decorative element, blank image), respond exactly with:SKIP"""
 
     assets_dir = Path(assets_dir)
 

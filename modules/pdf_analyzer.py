@@ -146,22 +146,64 @@ def analyze_pdf(pdf_path):
 
 def likely_has_table(page):
     """
-    Fallback heuristic for borderless tables.
-    Detects row-column structures instead of simple indentation.
+    Fallback heuristic for table detection.
+
+    Detects:
+    - Borderless tables (aligned text columns)
+    - Ruled tables (horizontal/vertical vector lines)
     """
+
+    # ----------------------------
+    # Check vector drawings
+    # ----------------------------
+
+    horizontal_lines = 0
+    vertical_lines = 0
+
+    try:
+        drawings = page.get_drawings()
+
+        for drawing in drawings:
+
+            for item in drawing["items"]:
+
+                # Straight line
+                if item[0] == "l":
+
+                    p1 = item[1]
+                    p2 = item[2]
+
+                    # Horizontal line
+                    if abs(p1.y - p2.y) < 2 and abs(p1.x - p2.x) > 30:
+                        horizontal_lines += 1
+
+                    # Vertical line
+                    elif abs(p1.x - p2.x) < 2 and abs(p1.y - p2.y) > 30:
+                        vertical_lines += 1
+
+    except Exception:
+        pass
+
+    # Strong indication of a ruled table
+    if horizontal_lines >= 3:
+        return True
+
+    # ----------------------------
+    # Borderless table detection
+    # ----------------------------
 
     blocks = page.get_text("blocks")
 
     if len(blocks) < 5:
         return False
 
-    # Group blocks by Y position (same row)
     rows = {}
 
     for block in blocks:
-        x0, y0 = round(block[0], 1), round(block[1], 1)
 
-        # Merge nearby Y values into the same row
+        x0 = round(block[0], 1)
+        y0 = round(block[1], 1)
+
         row_key = round(y0 / 5) * 5
 
         rows.setdefault(row_key, []).append(x0)
@@ -170,12 +212,9 @@ def likely_has_table(page):
 
     for xs in rows.values():
 
-        # Ignore duplicate X values in a row
         unique_x = len(set(xs))
 
-        # A table row usually has multiple columns
-        if unique_x >= 3:
+        if unique_x >= 2:
             row_like_count += 1
 
-    # Require several rows with multiple columns
     return row_like_count >= 3
