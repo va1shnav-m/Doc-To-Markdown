@@ -34,3 +34,19 @@ caption_cache.json
 # OS files
 .DS_Store
 Thumbs.db
+
+# Python packaging
+*.egg-info/
+build/
+dist/
+
+# Test & cache
+.pytest_cache/
+.mypy_cache/
+
+# Coverage
+.coverage
+htmlcov/
+
+# Jupyter
+.ipynb_checkpoints/
