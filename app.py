@@ -44,16 +44,18 @@ st.set_page_config(
 
 st.title("PDF to Markdown Converter")
 
-uploaded_file = st.file_uploader(
+uploaded_files = st.file_uploader(
     "Upload PDF, DOC or DOCX",
-    type=["pdf", "doc", "docx"]
+    type=["pdf", "doc", "docx"],
+    accept_multiple_files=True
 )
+
 
 # -------------------------------------------------------
 # Main Workflow
 # -------------------------------------------------------
 
-if uploaded_file is not None:
+if uploaded_files:
 
     # ----------------------------
     # Clear Previous Outputs
@@ -68,12 +70,20 @@ if uploaded_file is not None:
     # Save Uploaded File
     # ----------------------------
 
-    uploaded_path = TEMP_DIR / uploaded_file.name
+    uploaded_paths = []
 
-    with open(uploaded_path, "wb") as f:
-        shutil.copyfileobj(uploaded_file, f)
+    for uploaded_file in uploaded_files:
 
-    st.success(f"Uploaded : {uploaded_path.name}")
+        uploaded_path = TEMP_DIR / uploaded_file.name
+
+        with open(uploaded_path, "wb") as f:
+            shutil.copyfileobj(uploaded_file, f)
+
+        uploaded_paths.append(uploaded_path)
+
+        st.success(f"Uploaded : {uploaded_path.name}")
+
+    uploaded_path = uploaded_paths[0]    
 
     pipeline_start = time.perf_counter()
 
