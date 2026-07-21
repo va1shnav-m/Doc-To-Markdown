@@ -6,9 +6,7 @@ def combine_markdowns(output_dir):
     output_dir = Path(output_dir)
 
     markdown_files = sorted(
-        file
-        for file in output_dir.glob("*.md")
-        if file.name != "document.md"
+        output_dir.glob("chunk_*.md")
     )
 
     combined_markdown = []

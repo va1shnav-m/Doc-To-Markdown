@@ -28,7 +28,8 @@ OUTPUT_DIR.mkdir(exist_ok=True)
 ASSETS_DIR = Path("assets")
 ASSETS_DIR.mkdir(exist_ok=True)
 
-
+TEMP_ASSETS_DIR = Path("temp_assets")
+TEMP_ASSETS_DIR.mkdir(exist_ok=True)
 
 TEMP_CHUNKS_DIR = Path("temp_chunks")
 TEMP_CHUNKS_DIR.mkdir(exist_ok=True)
@@ -42,7 +43,7 @@ st.set_page_config(
     layout="wide"
 )
 
-st.title("PDF to Markdown Converter")
+st.title("PDF/DOC/DOCX to Markdown Conversion")
 
 uploaded_files = st.file_uploader(
     "Upload PDF, DOC or DOCX",
@@ -64,8 +65,7 @@ if uploaded_files:
     clear_folder("temp")
     clear_folder("output")
     clear_folder("assets")
-    clear_folder("temp_chunks")
-
+    
     # ----------------------------
     # Save Uploaded File
     # ----------------------------
@@ -83,311 +83,324 @@ if uploaded_files:
 
         st.success(f"Uploaded : {uploaded_path.name}")
 
-    uploaded_path = uploaded_paths[0]    
+    for document_index, uploaded_path in enumerate(uploaded_paths, start=1):
 
-    pipeline_start = time.perf_counter()
+        clear_folder("temp_assets")
+        clear_folder("temp_chunks")
 
-    try:
-
-        # ----------------------------
-        # Convert DOC -> DOCX
-        # ----------------------------
-
-        converted_path = Path(
-            convert_doc(uploaded_path)
+        st.markdown("---")
+        st.subheader(
+            f"Processing Document {document_index} of {len(uploaded_paths)}"
         )
+        st.write(uploaded_path.name)    
 
-        st.success("Document preparation completed.")
+        pipeline_start = time.perf_counter()
 
-        # ----------------------------
-        # PDF Analysis (Version 3)
-        # ----------------------------
+        try:
 
-        if converted_path.suffix.lower() == ".pdf":
+            # ----------------------------
+            # Convert DOC -> DOCX
+            # ----------------------------
 
-            st.subheader("PDF Analysis")
-
-            analysis_start = time.perf_counter()
-
-            analysis = analyze_pdf(converted_path)
-
-            execution_plan = create_execution_plan(analysis)
-
-            st.subheader("Creating Adaptive Chunks")
-
-            adaptive_chunk_paths = []
-
-            for index, chunk in enumerate(execution_plan):
-
-                chunk_name = f"chunk_{index:04d}"
-
-                temp_pdf = create_temp_pdf(
-                    source_pdf=converted_path,
-                    start_page=chunk["start_page"],
-                    end_page=chunk["end_page"],
-                    output_dir=TEMP_CHUNKS_DIR,
-                    chunk_name=chunk_name,
-                )
-
-                adaptive_chunk_paths.append(
-                    {
-                        "pdf": temp_pdf,
-                        "parser": chunk["parser"],
-                    }
-                )
-
-                st.write(
-                    f"{chunk_name} | "
-                    f"{chunk['parser']} | "
-                    f"Pages {chunk['start_page']} - {chunk['end_page']}"
-                )
-
-            st.subheader("Execution Plan")
-
-            for chunk in execution_plan:
-
-                st.write(
-                    f"{chunk['parser']} | "
-                    f"Pages {chunk['start_page']} - {chunk['end_page']} "
-                    f"({chunk['page_count']} pages)"
-                )
-
-            analysis_end = time.perf_counter()
-
-            st.info(
-                f"PDF Analysis Time : {analysis_end-analysis_start:.2f} seconds"
+            converted_path = Path(
+                convert_doc(uploaded_path)
             )
 
-            st.success("PDF analysis completed.")
+            st.success("Document preparation completed.")
 
-            with st.expander("Page Analysis"):
+            # ----------------------------
+            # PDF Analysis (Version 3)
+            # ----------------------------
 
-                for page in analysis:
+            if converted_path.suffix.lower() == ".pdf":
 
-                    st.write(
-                        f"Page {page['page']} | "
-                        f"Tables : {page['table_count']} | "
-                        f"Parser : {page['parser']}"
+                st.subheader("PDF Analysis")
+
+                analysis_start = time.perf_counter()
+
+                analysis = analyze_pdf(converted_path)
+
+                execution_plan = create_execution_plan(analysis)
+
+                st.subheader("Creating Adaptive Chunks")
+
+                adaptive_chunk_paths = []
+
+                for index, chunk in enumerate(execution_plan):
+
+                    chunk_name = f"chunk_{index:04d}"
+
+                    temp_pdf = create_temp_pdf(
+                        source_pdf=converted_path,
+                        start_page=chunk["start_page"],
+                        end_page=chunk["end_page"],
+                        output_dir=TEMP_CHUNKS_DIR,
+                        chunk_name=chunk_name,
                     )
 
-            st.success(f"Created {len(adaptive_chunk_paths)} adaptive chunks.")
+                    adaptive_chunk_paths.append(
+                        {
+                            "pdf": temp_pdf,
+                            "parser": chunk["parser"],
+                        }
+                    )
 
-        # ----------------------------
-        # Parsing Processing
-        # ----------------------------
+                    st.write(
+                        f"{chunk_name} | "
+                        f"{chunk['parser']} | "
+                        f"Pages {chunk['start_page']} - {chunk['end_page']}"
+                    )
 
-        st.subheader("Parser Processing")
+                st.subheader("Execution Plan")
 
-        parsing_start = time.perf_counter()
+                for chunk in execution_plan:
 
-        total_images = 0
+                    st.write(
+                        f"{chunk['parser']} | "
+                        f"Pages {chunk['start_page']} - {chunk['end_page']} "
+                        f"({chunk['page_count']} pages)"
+                    )
 
-        progress = st.progress(0)
+                analysis_end = time.perf_counter()
 
-        if converted_path.suffix.lower() == ".pdf":
+                st.info(
+                    f"PDF Analysis Time : {analysis_end-analysis_start:.2f} seconds"
+                )
 
-            total_chunks = len(adaptive_chunk_paths)
+                st.success("PDF analysis completed.")
+
+                with st.expander("Page Analysis"):
+
+                    for page in analysis:
+
+                        st.write(
+                            f"Page {page['page']} | "
+                            f"Tables : {page['table_count']} | "
+                            f"Parser : {page['parser']}"
+                        )
+
+                st.success(f"Created {len(adaptive_chunk_paths)} adaptive chunks.")
+
+            # ----------------------------
+            # Parsing Processing
+            # ----------------------------
+
+            st.subheader("Parser Processing")
+
+            parsing_start = time.perf_counter()
 
             total_images = 0
 
-            for index, chunk in enumerate(adaptive_chunk_paths):
+            progress = st.progress(0)
 
-                chunk_pdf_path = chunk["pdf"]
-                parser = chunk["parser"]
+            if converted_path.suffix.lower() == ".pdf":
 
-                chunk_name = Path(chunk_pdf_path).stem
+                total_chunks = len(adaptive_chunk_paths)
 
-                chunk_start = time.perf_counter()
+                total_images = 0
 
-                if parser == "docling":
+                for index, chunk in enumerate(adaptive_chunk_paths):
 
-                    result = parse_document(
-                        input_path=chunk_pdf_path,
-                        output_dir=OUTPUT_DIR,
-                        assets_dir=ASSETS_DIR,
-                        page_name=chunk_name,
+                    chunk_pdf_path = chunk["pdf"]
+                    parser = chunk["parser"]
+
+                    chunk_name = Path(chunk_pdf_path).stem
+
+                    chunk_start = time.perf_counter()
+
+                    if parser == "docling":
+
+                        result = parse_document(
+                            input_path=chunk_pdf_path,
+                            output_dir=OUTPUT_DIR,
+                            assets_dir=TEMP_ASSETS_DIR,
+                            page_name=chunk_name,
+                        )
+                        total_images += result["image_count"]
+
+                    else:
+
+                        result = parse_document_pymupdf(
+                            input_path=chunk_pdf_path,
+                            output_dir=OUTPUT_DIR,
+                            assets_dir=TEMP_ASSETS_DIR,
+                            page_name=chunk_name,
+                        )
+                        total_images += result["image_count"]
+
+                    chunk_end = time.perf_counter()
+
+                    st.write(
+                        f"{chunk_name} | "
+                        f"{parser} | "
+                        f"{chunk_end - chunk_start:.2f} sec"
                     )
-                    total_images += result["image_count"]
 
-                else:
+                    
 
-                    result = parse_document_pymupdf(
-                        input_path=chunk_pdf_path,
-                        output_dir=OUTPUT_DIR,
-                        assets_dir=ASSETS_DIR,
-                        page_name=chunk_name,
+                    progress.progress(
+                        (index + 1) / total_chunks
                     )
-                    total_images += result["image_count"]
 
-                chunk_end = time.perf_counter()
-
-                st.write(
-                    f"{chunk_name} | "
-                    f"{parser} | "
-                    f"{chunk_end - chunk_start:.2f} sec"
-                )
-
+                parsing_end = time.perf_counter()
                 
-
-                progress.progress(
-                    (index + 1) / total_chunks
+                st.info(
+                    f"Parsing Time : {parsing_end - parsing_start:.2f} seconds"
                 )
 
-            parsing_end = time.perf_counter()
-            
+                st.success("Document parsing completed.")    
+                st.metric("Images Extracted", total_images)
+                markdown_file = combine_markdowns(
+                    OUTPUT_DIR
+                )
+
+            else:
+
+                result = parse_document(
+                    input_path=converted_path,
+                    output_dir=OUTPUT_DIR,
+                    assets_dir=TEMP_ASSETS_DIR,
+                )
+
+                markdown_file = result["markdown"]
+
+                total_images = result["image_count"]
+
+                parsing_end = time.perf_counter()
+
+                st.info(
+                    f"Parsing Time : {parsing_end - parsing_start:.2f} seconds"
+                )
+
+                st.success("Document parsing completed.")
+
+                st.metric(
+                    "Images Extracted",
+                    total_images
+            )
+
+            progress.empty()    
+
+            # ----------------------------
+            # RapidOCR
+            # ----------------------------
+
+            st.subheader("RapidOCR")
+
+            ocr_start = time.perf_counter()
+
+            ocr_results = extract_ocr_text(
+                ASSETS_DIR
+            )
+
+            ocr_end = time.perf_counter()
+
             st.info(
-                f"Parsing Time : {parsing_end - parsing_start:.2f} seconds"
+                f"RapidOCR Time : {ocr_end-ocr_start:.2f} seconds"
             )
 
-            st.success("Document parsing completed.")    
-            st.metric("Images Extracted", total_images)
-            markdown_file = combine_markdowns(
-                OUTPUT_DIR
+            st.success("OCR completed.")
+
+            # ----------------------------
+            # Qwen Captioning
+            # ----------------------------
+
+            st.subheader("Image Captioning")
+
+            caption_start = time.perf_counter()
+
+            captions = generate_captions(
+                assets_dir=TEMP_ASSETS_DIR,
+                ocr_results=ocr_results
             )
 
-        else:
-
-            result = parse_document(
-                input_path=converted_path,
-                output_dir=OUTPUT_DIR,
-                assets_dir=ASSETS_DIR,
-            )
-
-            markdown_file = result["markdown"]
-
-            total_images = result["image_count"]
-
-            parsing_end = time.perf_counter()
+            caption_end = time.perf_counter()
 
             st.info(
-                f"Parsing Time : {parsing_end - parsing_start:.2f} seconds"
+                f"Image Captioning Time : {caption_end-caption_start:.2f} seconds"
             )
 
-            st.success("Document parsing completed.")
+            st.success("Image captioning completed.")
+
+            # ----------------------------
+            # Markdown Merge
+            # ----------------------------
+
+            st.subheader("Generating Final Markdown")
+
+            merge_start = time.perf_counter()
+
+            batch_markdown = OUTPUT_DIR / f"document_{document_index:04d}.md"
+
+            final_markdown = merge_markdown(
+                markdown_path=markdown_file,
+                assets_dir=TEMP_ASSETS_DIR,
+                ocr_results=ocr_results,
+                captions=captions,
+                output_path=batch_markdown,
+            )
+
+            merge_end = time.perf_counter()
+
+            st.info(
+                f"Markdown Merge Time : {merge_end-merge_start:.2f} seconds"
+            )
+
+            st.success("Final Markdown Generated")
+
+            st.write("Final Markdown File")
+
+            st.code(str(final_markdown))
+
+            # ----------------------------
+            # Download Button
+            # ----------------------------
+
+            with open(
+                final_markdown,
+                "r",
+                encoding="utf-8"
+            ) as f:
+
+                st.download_button(
+                    label="Download Markdown",
+                    data=f.read(),
+                    file_name="document.md",
+                    mime="text/markdown",
+                    key=f"download_{document_index}",
+                )
+
+            pipeline_end = time.perf_counter()
+
+            st.markdown("---")
+
+            st.subheader("Pipeline Performance")
 
             st.metric(
-                "Images Extracted",
-                total_images
-        )
-
-        progress.empty()    
-
-        # ----------------------------
-        # RapidOCR
-        # ----------------------------
-
-        st.subheader("RapidOCR")
-
-        ocr_start = time.perf_counter()
-
-        ocr_results = extract_ocr_text(
-            ASSETS_DIR
-        )
-
-        ocr_end = time.perf_counter()
-
-        st.info(
-            f"RapidOCR Time : {ocr_end-ocr_start:.2f} seconds"
-        )
-
-        st.success("OCR completed.")
-
-        # ----------------------------
-        # Qwen Captioning
-        # ----------------------------
-
-        st.subheader("Image Captioning")
-
-        caption_start = time.perf_counter()
-
-        captions = generate_captions(
-            assets_dir=ASSETS_DIR,
-            ocr_results=ocr_results
-        )
-
-        caption_end = time.perf_counter()
-
-        st.info(
-            f"Image Captioning Time : {caption_end-caption_start:.2f} seconds"
-        )
-
-        st.success("Image captioning completed.")
-
-        # ----------------------------
-        # Markdown Merge
-        # ----------------------------
-
-        st.subheader("Generating Final Markdown")
-
-        merge_start = time.perf_counter()
-
-        final_markdown = merge_markdown(
-            markdown_path=markdown_file,
-            assets_dir=ASSETS_DIR,
-            ocr_results=ocr_results,
-            captions=captions,
-        )
-
-        merge_end = time.perf_counter()
-
-        st.info(
-            f"Markdown Merge Time : {merge_end-merge_start:.2f} seconds"
-        )
-
-        st.success("Final Markdown Generated")
-
-        st.write("Final Markdown File")
-
-        st.code(str(final_markdown))
-
-        # ----------------------------
-        # Download Button
-        # ----------------------------
-
-        with open(
-            final_markdown,
-            "r",
-            encoding="utf-8"
-        ) as f:
-
-            st.download_button(
-                label="Download Markdown",
-                data=f.read(),
-                file_name="document.md",
-                mime="text/markdown",
+                "Total Processing Time",
+                f"{pipeline_end-pipeline_start:.2f} sec"
             )
 
-        pipeline_end = time.perf_counter()
+            st.write("Stage Breakdown")
 
-        st.markdown("---")
+            st.write(
+                f"📄 Parser(Docling/PyMuPDF) : {parsing_end-parsing_start:.2f} sec"
+            )
 
-        st.subheader("Pipeline Performance")
+            st.write(
+                f"🔍 RapidOCR : {ocr_end-ocr_start:.2f} sec"
+            )
 
-        st.metric(
-            "Total Processing Time",
-            f"{pipeline_end-pipeline_start:.2f} sec"
-        )
+            st.write(
+                f"🖼️ SmolVLM : {caption_end-caption_start:.2f} sec"
+            )
 
-        st.write("Stage Breakdown")
-
-        st.write(
-            f"📄 Parser(Docling/PyMuPDF) : {parsing_end-parsing_start:.2f} sec"
-        )
-
-        st.write(
-            f"🔍 RapidOCR : {ocr_end-ocr_start:.2f} sec"
-        )
-
-        st.write(
-            f"🖼️ SmolVLM : {caption_end-caption_start:.2f} sec"
-        )
-
-        st.write(
-            f"📝 Markdown Merge : {merge_end-merge_start:.2f} sec"
-        )    
+            st.write(
+                f"📝 Markdown Merge : {merge_end-merge_start:.2f} sec"
+            )    
 
         
 
-    except Exception as e:
+        except Exception as e:
 
-        st.error(f"Pipeline Failed\n\n{e}")
+            st.error(f"Pipeline Failed\n\n{e}")

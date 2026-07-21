@@ -1,5 +1,6 @@
 from pathlib import Path
 import fitz
+import pymupdf4llm
 
 
 def parse_document(
