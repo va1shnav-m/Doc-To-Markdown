@@ -36,9 +36,9 @@ def parse_document(
         markdown_path = output_dir / "document.md"
 
     doc = fitz.open(input_path)
-
-    markdown = []
-
+    markdown_text = pymupdf4llm.to_markdown(doc)
+    
+    page_placeholders = []
     image_count = 0
 
     for page in doc:
@@ -49,18 +49,12 @@ def parse_document(
         # Extract Text
         # --------------------------
 
-        try:
-            text = page.get_text("markdown")
-        except Exception:
-            text = page.get_text("text")
-
-        markdown.append(text)
-        markdown.append("\n\n")
+        
 
         # --------------------------
         # Extract Images
         # --------------------------
-
+        page_image_count = 0
         images = page.get_images(full=True)
 
         for image in images:
@@ -78,6 +72,7 @@ def parse_document(
             image_ext = base_image["ext"]
 
             image_count += 1
+            page_image_count += 1
 
             if page_name:
 
@@ -96,14 +91,15 @@ def parse_document(
             with open(image_path, "wb") as f:
                 f.write(image_bytes)
 
-            markdown.append(
-                    "<!-- image -->\n\n"
-            )
+            # markdown.append(
+            #         "<!-- image -->\n\n"
+            # )
+        page_placeholders.append(page_image_count)    
 
     doc.close()
-
+    
     markdown_path.write_text(
-        "".join(markdown),
+        markdown_text,
         encoding="utf-8",
     )
 
