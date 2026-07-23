@@ -1,7 +1,7 @@
 from pathlib import Path
 
 
-def combine_markdowns(output_dir):
+def combine_markdowns(output_dir, output_name="document.md"):
 
     output_dir = Path(output_dir)
 
@@ -20,7 +20,7 @@ def combine_markdowns(output_dir):
         combined_markdown.append(markdown)
         combined_markdown.append("\n\n")
 
-    final_markdown = output_dir / "document.md"
+    final_markdown = output_dir / output_name
 
     final_markdown.write_text(
         "".join(combined_markdown),

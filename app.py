@@ -250,8 +250,11 @@ if uploaded_files:
 
                 st.success("Document parsing completed.")    
                 st.metric("Images Extracted", total_images)
+                raw_markdown_name = f"document_{document_index:04d}_raw.md"
+
                 markdown_file = combine_markdowns(
-                    OUTPUT_DIR
+                    OUTPUT_DIR,
+                    output_name=raw_markdown_name,
                 )
 
             else:
