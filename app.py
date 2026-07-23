@@ -46,18 +46,34 @@ st.set_page_config(
 
 st.title("PDF/DOC/DOCX to Markdown Conversion")
 
-uploaded_files = st.file_uploader(
+if "uploaded_files" not in st.session_state:
+    st.session_state.uploaded_files = []
+
+uploaded_file = st.file_uploader(
     "Upload PDF, DOC or DOCX",
-    type=["pdf", "doc", "docx"],
-    accept_multiple_files=True
-)
+    type=["pdf", "doc", "docx"]
+    )
 
+# Store uploaded files
+if "uploaded_files" not in st.session_state:
+    st.session_state.uploaded_files = []
 
-# -------------------------------------------------------
-# Main Workflow
-# -------------------------------------------------------
+# Add uploaded file to the list
+if uploaded_file and uploaded_file.name not in [
+    f.name for f in st.session_state.uploaded_files
+]:
+    st.session_state.uploaded_files.append(uploaded_file)
 
-if uploaded_files:
+# Show uploaded files
+st.subheader("Uploaded Files")
+
+for index, file in enumerate(
+    st.session_state.uploaded_files,
+    start=1
+):
+    st.write(f"{index}. {file.name}")
+
+if st.button("Start Processing") and st.session_state.uploaded_files:
 
     # ----------------------------
     # Clear Previous Outputs
@@ -73,7 +89,7 @@ if uploaded_files:
 
     uploaded_paths = []
 
-    for uploaded_file in uploaded_files:
+    for uploaded_file in st.session_state.uploaded_files:
 
         uploaded_path = TEMP_DIR / uploaded_file.name
 
@@ -110,8 +126,6 @@ if uploaded_files:
                 convert_doc(uploaded_path)
             )
 
-            st.success("Document preparation completed.")
-
             # ----------------------------
             # PDF Analysis (Version 3)
             # ----------------------------
@@ -126,7 +140,7 @@ if uploaded_files:
 
                 execution_plan = create_execution_plan(analysis)
 
-                st.subheader("Creating Adaptive Chunks")
+                
 
                 adaptive_chunk_paths = []
 
@@ -152,16 +166,7 @@ if uploaded_files:
                     st.write(
                         f"{chunk_name} | "
                         f"{chunk['parser']} | "
-                        f"Pages {chunk['start_page']} - {chunk['end_page']}"
-                    )
-
-                st.subheader("Execution Plan")
-
-                for chunk in execution_plan:
-
-                    st.write(
-                        f"{chunk['parser']} | "
-                        f"Pages {chunk['start_page']} - {chunk['end_page']} "
+                        f"Pages {chunk['start_page']} - {chunk['end_page']} | "
                         f"({chunk['page_count']} pages)"
                     )
 
@@ -170,18 +175,6 @@ if uploaded_files:
                 st.info(
                     f"PDF Analysis Time : {analysis_end-analysis_start:.2f} seconds"
                 )
-
-                st.success("PDF analysis completed.")
-
-                with st.expander("Page Analysis"):
-
-                    for page in analysis:
-
-                        st.write(
-                            f"Page {page['page']} | "
-                            f"Tables : {page['table_count']} | "
-                            f"Parser : {page['parser']}"
-                        )
 
                 st.success(f"Created {len(adaptive_chunk_paths)} adaptive chunks.")
 
@@ -279,8 +272,6 @@ if uploaded_files:
                     f"Parsing Time : {parsing_end - parsing_start:.2f} seconds"
                 )
 
-                st.success("Document parsing completed.")
-
                 st.metric(
                     "Images Extracted",
                     total_images
@@ -306,8 +297,6 @@ if uploaded_files:
                 f"RapidOCR Time : {ocr_end-ocr_start:.2f} seconds"
             )
 
-            st.success("OCR completed.")
-
             # ----------------------------
             # Qwen Captioning
             # ----------------------------
@@ -327,8 +316,6 @@ if uploaded_files:
                 f"Image Captioning Time : {caption_end-caption_start:.2f} seconds"
             )
 
-            st.success("Image captioning completed.")
-
             # ----------------------------
             # Markdown Merge
             # ----------------------------
@@ -338,10 +325,7 @@ if uploaded_files:
             merge_start = time.perf_counter()
 
             batch_markdown = OUTPUT_DIR / f"document_{document_index:04d}.md"
-
-            st.write(f"Raw markdown : {markdown_file}")
-            st.write(f"Output markdown : {batch_markdown}")
-
+            
             final_markdown = merge_markdown(
                 markdown_path=markdown_file,
                 assets_dir=TEMP_ASSETS_DIR,
@@ -355,8 +339,6 @@ if uploaded_files:
             st.info(
                 f"Markdown Merge Time : {merge_end-merge_start:.2f} seconds"
             )
-
-            st.success("Final Markdown Generated")
 
             st.write("Final Markdown File")
 
@@ -375,7 +357,7 @@ if uploaded_files:
                 st.download_button(
                     label="Download Markdown",
                     data=f.read(),
-                    file_name="document.md",
+                    file_name=final_markdown.name,
                     mime="text/markdown",
                     key=f"download_{document_index}",
                 )
@@ -391,22 +373,20 @@ if uploaded_files:
                 f"{pipeline_end-pipeline_start:.2f} sec"
             )
 
-            st.write("Stage Breakdown")
-
             st.write(
-                f"📄 Parser(Docling/PyMuPDF) : {parsing_end-parsing_start:.2f} sec"
+                f" Parser(Docling/PyMuPDF) : {parsing_end-parsing_start:.2f} sec"
             )
 
             st.write(
-                f"🔍 RapidOCR : {ocr_end-ocr_start:.2f} sec"
+                f" RapidOCR : {ocr_end-ocr_start:.2f} sec"
             )
 
             st.write(
-                f"🖼️ SmolVLM : {caption_end-caption_start:.2f} sec"
+                f" SmolVLM : {caption_end-caption_start:.2f} sec"
             )
 
             st.write(
-                f"📝 Markdown Merge : {merge_end-merge_start:.2f} sec"
+                f" Markdown Merge : {merge_end-merge_start:.2f} sec"
             )    
 
         
@@ -417,6 +397,16 @@ if uploaded_files:
             
     final_batch = combine_final_documents(OUTPUT_DIR)
 
-    st.success("Combined batch markdown created.")
+    st.success("Combined markdown created.")
 
     st.code(str(final_batch))        
+
+    with open(final_batch, "r", encoding="utf-8") as f:
+
+        st.download_button(
+            label="Download Combined Markdown",
+            data=f.read(),
+            file_name=final_batch.name,
+            mime="text/markdown",
+            key="download_combined_markdown",
+        )
