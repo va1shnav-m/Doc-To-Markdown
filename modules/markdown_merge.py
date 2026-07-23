@@ -51,12 +51,12 @@ def merge_markdown(
         *assets_dir.glob("*.webp"),
     ]
 )
-    print("\n===== Images seen by merge =====")
+    # print("\n===== Images seen by merge =====")
 
-    for image in image_files:
-        print(image.name)
+    # for image in image_files:
+    #     print(image.name)
 
-    print("===============================\n")
+    # print("===============================\n")
     
 
     figure_number = 1
@@ -117,9 +117,9 @@ def merge_markdown(
 
         replacement.append("")
 
-        print(
-        f"Merging image: {image_name}"
-    )
+    #     print(
+    #     f"Merging image: {image_name}"
+    # )
         
         markdown = markdown.replace(
             "<!-- image -->",
