@@ -290,7 +290,7 @@ if uploaded_files:
             ocr_start = time.perf_counter()
 
             ocr_results = extract_ocr_text(
-                ASSETS_DIR
+                TEMP_ASSETS_DIR
             )
 
             ocr_end = time.perf_counter()
