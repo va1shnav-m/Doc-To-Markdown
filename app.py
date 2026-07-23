@@ -4,6 +4,7 @@ import shutil
 import time
 
 from modules.markdown_combiner import combine_markdowns
+from modules.markdown_combiner import combine_final_documents
 from modules.doc_converter import convert_doc
 from modules.docling_parser import parse_document
 from modules.pymupdf_parser import parse_document as parse_document_pymupdf
@@ -87,6 +88,9 @@ if uploaded_files:
 
         clear_folder("temp_assets")
         clear_folder("temp_chunks")
+
+        for chunk_file in OUTPUT_DIR.glob("chunk_*.md"):
+            chunk_file.unlink()
 
         st.markdown("---")
         st.subheader(
@@ -335,6 +339,9 @@ if uploaded_files:
 
             batch_markdown = OUTPUT_DIR / f"document_{document_index:04d}.md"
 
+            st.write(f"Raw markdown : {markdown_file}")
+            st.write(f"Output markdown : {batch_markdown}")
+
             final_markdown = merge_markdown(
                 markdown_path=markdown_file,
                 assets_dir=TEMP_ASSETS_DIR,
@@ -407,3 +414,9 @@ if uploaded_files:
         except Exception as e:
 
             st.error(f"Pipeline Failed\n\n{e}")
+            
+    final_batch = combine_final_documents(OUTPUT_DIR)
+
+    st.success("Combined batch markdown created.")
+
+    st.code(str(final_batch))        
