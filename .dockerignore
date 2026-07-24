@@ -1,0 +1,87 @@
+# -------------------------
+# Python
+# -------------------------
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# -------------------------
+# Git
+# -------------------------
+.git/
+.gitignore
+
+# -------------------------
+# IDE / Editor
+# -------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# -------------------------
+# OS Files
+# -------------------------
+.DS_Store
+Thumbs.db
+
+# -------------------------
+# Build / Distribution
+# -------------------------
+build/
+dist/
+*.egg-info/
+
+# -------------------------
+# Application Generated Files
+# -------------------------
+output/
+temp/
+temp_chunks/
+temp_assets/
+logs/
+caption_cache.json
+
+# Generated assets (uncomment if these are generated during runtime)
+assets/
+
+# -------------------------
+# Documents (don't copy test files)
+# -------------------------
+*.pdf
+*.doc
+*.docx
+*.ppt
+*.pptx
+
+# Sample input/output folders
+samples/
+test_data/
+example_docs/
+
+# -------------------------
+# Environment
+# -------------------------
+.env
+.env.*
+
+# -------------------------
+# Jupyter
+# -------------------------
+.ipynb_checkpoints/
+
+# -------------------------
+# Docker
+# -------------------------
+Dockerfile.old
+docker-compose.override.yml
