@@ -1,7 +1,37 @@
 from pathlib import Path
 import fitz
+import re
 
+def format_heading(text: str, font: str) -> str:
+    """
+    Convert numbered headings to Markdown headings.
+    """
 
+    text = text.strip()
+    
+    # 1.2.3 Heading
+    if re.match(r"^\d+\.\d+\.\d+\b", text):
+        return f"### {text}"
+
+    # 1.2 Heading
+    if re.match(r"^\d+\.\d+\b", text):
+        return f"## {text}"
+
+    # 1. Heading
+    if re.match(r"^\d+\.\b", text):
+        return f"# {text}"
+
+    # Common unnumbered headings
+    if text.lower() in {
+        "references",
+        "appendix",
+        "glossary",
+        "revision history",
+        "table of contents",
+    }:
+        return f"# {text}"
+
+    return text
 
 def parse_document(
     input_path,
@@ -49,14 +79,48 @@ def parse_document(
         # Extract Text
         # --------------------------
 
-        try:
-            text = page.get_text("markdown")
-        except Exception:
-            text = page.get_text("text")
+        # try:
+        #     text = page.get_text("markdown")
+        # except Exception:
+        #     text = page.get_text("text")
 
-        markdown.append(text)
-        markdown.append("\n\n")
+        # markdown.append(text)
+        # markdown.append("\n\n")
+        text_dict = page.get_text("dict")
 
+        for block in text_dict["blocks"]:
+
+            if "lines" not in block:
+                continue
+
+            for line in block["lines"]:
+
+                line_text = ""
+                is_bold = False
+
+                for span in line["spans"]:
+
+                    span_text = span["text"].strip()
+
+                    if not span_text:
+                        continue
+
+                    
+                    if "Bold" in span["font"]:
+                        is_bold = True
+
+                    line_text += span_text + " "
+
+                line = line_text.strip()
+
+                if line:
+
+                    font = "Bold" if is_bold else ""
+
+                    line = format_heading(line, font)
+
+                    markdown.append(line)
+                    markdown.append("\n")
         # --------------------------
         # Extract Images
         # --------------------------
