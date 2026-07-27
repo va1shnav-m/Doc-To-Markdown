@@ -15,7 +15,7 @@ from modules.image_filter import should_caption
 
 CACHE_FILE = Path("caption_cache.json")
 
-MAX_IMAGE_SIZE = 768
+MAX_IMAGE_SIZE = 512
 
 PHASH_THRESHOLD = 4
 
@@ -96,11 +96,24 @@ def resize_image(image_path):
 def generate_captions(assets_dir, ocr_results):
 
     prompt = """
-Describe this image in 1-3 concise sentences.
-Focus only on important technical content such as:
-- diagrams,flowcharts, architecture, UI/screenshots, tables, graph, code, forms etc.
-Mention the main purpose and key components. Do not describe colors, styling, or unnecessary visual details.
-If the image contains no meaningful technical information (logo, icon, decorative element, blank image), respond exactly with:SKIP"""
+Describe this image in 1-2 concise sentences.
+
+Focus only on technical content:
+- diagrams
+- flowcharts
+- architecture
+- UI/screenshots
+- tables
+- graphs
+- code
+- forms
+
+Mention only the purpose and key components.
+
+Ignore colors, styling, decorations, logos, icons, and blank images.
+
+If there is no meaningful technical content, respond exactly:
+SKIP"""
 
     assets_dir = Path(assets_dir)
 
