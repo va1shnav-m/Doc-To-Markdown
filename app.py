@@ -7,7 +7,7 @@ from modules.markdown_combiner import combine_markdowns
 from modules.markdown_combiner import combine_final_documents
 from modules.doc_converter import convert_doc
 from modules.docling_parser import parse_document
-from modules.pymupdf_parser import parse_document as parse_document_pymupdf
+# from modules.pymupdf_parser import parse_document as parse_document_pymupdf
 from modules.rapidocr_parser import extract_ocr_text
 from modules.smolvlm_caption import generate_captions
 from modules.markdown_merge import merge_markdown
@@ -15,6 +15,7 @@ from modules.pdf_analyzer import analyze_pdf
 from modules.adaptive_chunker import create_execution_plan
 from modules.adaptive_chunker import create_temp_pdf
 from pipelines.docling_pipeline import process_docling_pipeline
+from modules.pymupdf4llm_parser import parse_document as parse_document_pymupdf
 from modules.utils import clear_folder
 
 # ----------------------------

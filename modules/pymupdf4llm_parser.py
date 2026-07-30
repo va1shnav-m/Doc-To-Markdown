@@ -2,38 +2,38 @@ from pathlib import Path
 import fitz
 import re
 import pymupdf4llm
-import itertools
+#import itertools
 
-def format_heading(text: str, font: str) -> str:
-    """
-    Convert numbered headings to Markdown headings.
-    """
+# def format_heading(text: str, font: str) -> str:
+#     """
+#     Convert numbered headings to Markdown headings.
+#     """
 
-    text = text.strip()
+#     text = text.strip()
     
-    # 1.2.3 Heading
-    if re.match(r"^\d+\.\d+\.\d+\b", text):
-        return f"### {text}"
+#     # 1.2.3 Heading
+#     if re.match(r"^\d+\.\d+\.\d+\b", text):
+#         return f"### {text}"
 
-    # 1.2 Heading
-    if re.match(r"^\d+\.\d+\b", text):
-        return f"## {text}"
+#     # 1.2 Heading
+#     if re.match(r"^\d+\.\d+\b", text):
+#         return f"## {text}"
 
-    # 1. Heading
-    if re.match(r"^\d+\.\b", text):
-        return f"# {text}"
+#     # 1. Heading
+#     if re.match(r"^\d+\.\b", text):
+#         return f"# {text}"
 
-    # Common unnumbered headings
-    if text.lower() in {
-        "references",
-        "appendix",
-        "glossary",
-        "revision history",
-        "table of contents",
-    }:
-        return f"# {text}"
+#     # Common unnumbered headings
+#     if text.lower() in {
+#         "references",
+#         "appendix",
+#         "glossary",
+#         "revision history",
+#         "table of contents",
+#     }:
+#         return f"# {text}"
 
-    return text
+#     return text
 
 def parse_document(
     input_path,
@@ -68,12 +68,27 @@ def parse_document(
         markdown_path = output_dir / "document.md"
 
     doc = fitz.open(input_path)
-
+    
     markdown = pymupdf4llm.to_markdown(
         doc,
         write_images=True,
         image_path=str(assets_dir),
     )
+    # Replace markdown image links with placeholder
+    markdown = re.sub(
+        r'!\[.*?\]\(.*?\)',
+        '<!-- image -->',
+        markdown
+    )
+
+    # Remove PyMuPDF4LLM picture text blocks
+    markdown = re.sub(
+        r'<!-- Start of picture text -->.*?<!-- End of picture text -->',
+        '',
+        markdown,
+        flags=re.DOTALL
+    )
+    image_count = markdown.count("<!-- image -->")
     
     # pattern = (
     #     r"<!-- Start of picture text -->"
@@ -132,7 +147,7 @@ def parse_document(
 
     #         with open(image_path, "wb") as f:
     #             f.write(image_bytes)
-    image_count = 0
+    
     doc.close()
 
     markdown_path.write_text(

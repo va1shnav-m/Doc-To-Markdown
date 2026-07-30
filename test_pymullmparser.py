@@ -2,7 +2,7 @@ from pathlib import Path
 import shutil
 from modules import pymupdf4llm_parser
 
-pdf_path = r"C:\Users\Vaishnav M\Projects\PDFtoMarkdown_V3\Annex-A-Detailed-Software-Requirements-Specification-SRS-1-43.pdf"
+pdf_path = r"C:\Users\Vaishnav M\Projects\PDFtoMarkdown_V3\srs_example_2010_group2 (1)-1-36.pdf"
 
 output_dir = Path("test_output")
 assets_dir = output_dir / "assets"

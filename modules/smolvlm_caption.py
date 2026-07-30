@@ -95,25 +95,13 @@ def resize_image(image_path):
 
 def generate_captions(assets_dir, ocr_results):
 
-    prompt = """
-Describe this image in 1-2 concise sentences.
-
-Focus only on technical content:
-- diagrams
-- flowcharts
-- architecture
-- UI/screenshots
-- tables
-- graphs
-- code
-- forms
-
-Mention only the purpose and key components.
-
-Ignore colors, styling, decorations, logos, icons, and blank images.
-
-If there is no meaningful technical content, respond exactly:
-SKIP"""
+    prompt = (
+    "Describe the technical content of this image in 1-2 concise sentences. "
+    "Include only the purpose and key elements of diagrams, charts, tables, "
+    "code, UI, architecture, or flowcharts. "
+    "Ignore decorative details. "
+    'Reply only "SKIP" if there is no useful technical content.'
+)
 
     assets_dir = Path(assets_dir)
 
@@ -203,7 +191,6 @@ SKIP"""
 
             options = {
                 "temperature": 0,
-                
                 "repeat_penalty": 1.1,
             }
 
