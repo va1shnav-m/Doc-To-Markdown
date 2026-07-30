@@ -59,7 +59,7 @@ processing_mode = st.radio(
     "Processing Mode",
     [
         "PyMuPDF + Docling",
-        "Docling Only",
+        "Docling (If Only PDFs)",
     ],
     horizontal=True,
 )
@@ -132,11 +132,16 @@ if st.button("Start Processing") and st.session_state.uploaded_files:
             # Convert DOC -> DOCX
             # ----------------------------
 
-            converted_path = Path(
-                convert_doc(uploaded_path)
-            )
+            suffix = uploaded_path.suffix.lower()
 
-            if processing_mode == "Docling Only":
+            converted_path = uploaded_path
+
+            if suffix == ".doc":
+                converted_path = Path(convert_doc(uploaded_path))
+
+            # Parser Selection
+
+            if processing_mode == "Docling (If Only PDFs)":
 
                 # Call the new pipeline
                 result = process_docling_pipeline(

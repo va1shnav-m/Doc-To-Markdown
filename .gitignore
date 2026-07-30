@@ -27,6 +27,7 @@ temp_chunks/
 tmp/
 temp_assets/
 test_pymupdf4llm.py
+test_output
 
 
 # Generated output
