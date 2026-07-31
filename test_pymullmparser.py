@@ -1,6 +1,6 @@
 from pathlib import Path
 import shutil
-from modules import pymupdf4llm_parser
+from . import pymupdf4llm_parser
 
 pdf_path = r"C:\Users\Vaishnav M\Projects\PDFtoMarkdown_V3\srs_example_2010_group2 (1)-1-36.pdf"
 
