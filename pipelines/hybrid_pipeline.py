@@ -11,6 +11,8 @@ from modules.markdown_combiner import combine_markdowns
 from modules.rapidocr_parser import extract_ocr_text
 from modules.smolvlm_caption import generate_captions
 from modules.markdown_merge import merge_markdown
+from modules.reporting import ProcessingReport
+from modules.ui import StreamlitUI
 
 
 
@@ -20,6 +22,7 @@ def process_hybrid_pipeline(
     temp_assets_dir,
     temp_chunks_dir,
     document_index,
+    ui=None,
 ):
     
     pipeline_start = time.perf_counter()
@@ -29,20 +32,42 @@ def process_hybrid_pipeline(
     ocr_time = 0.0
     caption_time = 0.0
     merge_time = 0.0
+    if ui is None:
+        ui = StreamlitUI()
+    report = ProcessingReport()
 
+    report.input_file = converted_path.name
     # ----------------------------
     # PDF Analysis 
     # ----------------------------
     if converted_path.suffix.lower() == ".pdf":
 
-        st.subheader("PDF Analysis")
+        ui.subheader("PDF Analysis")
 
         analysis_start = time.perf_counter()
 
-        print("Before analyze_pdf")
+        
         analysis = analyze_pdf(converted_path)
-        print("After analyze_pdf")
+        # --------------------------------------------
+        # Report Statistics
+        # --------------------------------------------
 
+        report.total_pages = len(analysis)
+
+        report.docling_pages = sum(
+            1 for page in analysis
+            if page["parser"] == "docling"
+        )
+
+        report.pymupdf_pages = sum(
+            1 for page in analysis
+            if page["parser"] == "pymupdf"
+        )
+
+        report.tables_found = sum(
+            page["table_count"]
+            for page in analysis
+        )
         execution_plan = create_execution_plan(analysis)
 
         
@@ -68,7 +93,7 @@ def process_hybrid_pipeline(
                 }
             )
 
-            st.write(
+            ui.write(
                 f"{chunk_name} | "
                 f"{chunk['parser']} | "
                 f"Pages {chunk['start_page']} - {chunk['end_page']} | "
@@ -78,23 +103,23 @@ def process_hybrid_pipeline(
         analysis_end = time.perf_counter()
         analysis_time = analysis_end - analysis_start
 
-        st.info(
+        ui.info(
             f"PDF Analysis Time : {analysis_time:.2f} seconds"
         )
 
-        st.success(f"Created {len(adaptive_chunk_paths)} adaptive chunks.")
+        ui.success(f"Created {len(adaptive_chunk_paths)} adaptive chunks.")
 
     # ----------------------------
     # Parsing Processing
     # ----------------------------
 
-    st.subheader("Parser Processing")
+    ui.subheader("Parser Processing")
 
     parsing_start = time.perf_counter()
 
     total_images = 0
 
-    progress = st.progress(0)
+    progress = ui.progress(0)
 
     if converted_path.suffix.lower() == ".pdf":
 
@@ -133,7 +158,7 @@ def process_hybrid_pipeline(
 
             chunk_end = time.perf_counter()
 
-            st.write(
+            ui.write(
                 f"{chunk_name} | "
                 f"{parser} | "
                 f"{chunk_end - chunk_start:.2f} sec"
@@ -148,11 +173,11 @@ def process_hybrid_pipeline(
         parsing_end = time.perf_counter()
         parsing_time = parsing_end - parsing_start
         
-        st.info(
+        ui.info(
             f"Parsing Time : {parsing_time:.2f} seconds"
         )
 
-        st.success("Document parsing completed.")    
+        ui.success("Document parsing completed.")    
         raw_markdown_name = f"document_{document_index:04d}_raw.md"
 
         markdown_file = combine_markdowns(
@@ -175,7 +200,7 @@ def process_hybrid_pipeline(
         parsing_end = time.perf_counter()
         parsing_time = parsing_end - parsing_start
 
-        st.info(
+        ui.info(
             f"Parsing Time : {parsing_time:.2f} seconds"
         )
         
@@ -185,17 +210,21 @@ def process_hybrid_pipeline(
     # RapidOCR
     # ----------------------------
 
-    st.subheader("RapidOCR")
+    ui.subheader("RapidOCR")
 
     ocr_start = time.perf_counter()
 
-    ocr_results = extract_ocr_text(
+    ocr_result = extract_ocr_text(
         temp_assets_dir
     )
 
+    ocr_results = ocr_result["results"]
+
+    report.ocr_images = ocr_result["ocr_image_count"]
+
     ocr_end = time.perf_counter()
     ocr_time = ocr_end - ocr_start
-    st.info(
+    ui.info(
         f"RapidOCR Time : {ocr_time:.2f} seconds"
     )
 
@@ -203,18 +232,24 @@ def process_hybrid_pipeline(
     # Qwen Captioning
     # ----------------------------
 
-    st.subheader("Image Captioning")
+    ui.subheader("Image Captioning")
 
     caption_start = time.perf_counter()
 
-    captions = generate_captions(
+    caption_result = generate_captions(
         assets_dir=temp_assets_dir,
-        ocr_results=ocr_results
+        ocr_results=ocr_results,
     )
+
+    captions = caption_result["captions"]
+
+    report.captions_generated = caption_result["generated"]
+    report.captions_cached = caption_result["cached"]
+    report.captions_skipped = caption_result["skipped"]
 
     caption_end = time.perf_counter()
     caption_time = caption_end - caption_start
-    st.info(
+    ui.info(
         f"Image Captioning Time : {caption_time:.2f} seconds"
     )
 
@@ -222,7 +257,7 @@ def process_hybrid_pipeline(
     # Markdown Merge
     # ----------------------------
 
-    st.subheader("Generating Final Markdown")
+    ui.subheader("Generating Final Markdown")
 
     merge_start = time.perf_counter()
 
@@ -238,11 +273,22 @@ def process_hybrid_pipeline(
 
     merge_end = time.perf_counter()
     merge_time = merge_end - merge_start
-    st.info(
+    ui.info(
         f"Markdown Merge Time : {merge_time:.2f} seconds"
     )
     
     pipeline_end = time.perf_counter()
+    report.output_file = final_markdown.name
+
+    report.images_extracted = total_images
+
+    report.analysis_time = analysis_time
+    report.chunking_time = chunking_time
+    report.parsing_time = parsing_time
+    report.ocr_time = ocr_time
+    report.caption_time = caption_time
+    report.merge_time = merge_time
+    report.total_time = pipeline_end - pipeline_start
 
     return {
         "markdown": final_markdown,
@@ -255,5 +301,6 @@ def process_hybrid_pipeline(
             "caption": caption_time,
             "merge": merge_time,
             "total": pipeline_end - pipeline_start,
-        }
+        },
+        "report": report
     } 

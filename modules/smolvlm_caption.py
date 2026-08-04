@@ -15,7 +15,7 @@ from modules.image_filter import should_caption
 
 CACHE_FILE = Path("caption_cache.json")
 
-MAX_IMAGE_SIZE = 768
+MAX_IMAGE_SIZE = 1024
 
 PHASH_THRESHOLD = 4
 
@@ -229,4 +229,9 @@ SKIP
     print(f"Total Time       : {total_end-total_start:.2f} sec")
     print("==============================")
 
-    return captions
+    return {
+        "captions": captions,
+        "generated": generated,
+        "cached": cached,
+        "skipped": skipped,
+    }

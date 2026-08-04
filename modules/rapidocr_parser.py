@@ -34,13 +34,13 @@ def extract_ocr_text(assets_dir):
     results = {}
 
     image_files = sorted(
-    [
-        *assets_dir.glob("*.png"),
-        *assets_dir.glob("*.jpg"),
-        *assets_dir.glob("*.jpeg"),
-        *assets_dir.glob("*.webp"),
-    ]
-)
+        [
+            *assets_dir.glob("*.png"),
+            *assets_dir.glob("*.jpg"),
+            *assets_dir.glob("*.jpeg"),
+            *assets_dir.glob("*.webp"),
+        ]
+    )
 
     for image_path in image_files:
 
@@ -74,4 +74,17 @@ def extract_ocr_text(assets_dir):
 
         }
 
-    return results
+        # ---------------------------------------
+        # Count images that contain OCR text
+        # ---------------------------------------
+
+        ocr_image_count = sum(
+            1
+            for item in results.values()
+            if item["char_count"] > 0
+        )
+
+        return {
+            "results": results,
+            "ocr_image_count": ocr_image_count,
+        }

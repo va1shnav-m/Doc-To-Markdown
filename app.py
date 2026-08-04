@@ -7,6 +7,8 @@ from modules.doc_converter import convert_doc
 from pipelines.docling_pipeline import process_docling_pipeline
 from pipelines.hybrid_pipeline import process_hybrid_pipeline
 from modules.utils import clear_folder
+from modules.reporting import display_report
+
 
 # ----------------------------
 # Folders
@@ -156,6 +158,7 @@ if st.button("Start Processing") and st.session_state.uploaded_files:
             final_markdown = result["markdown"]
             total_images = result["image_count"]
             timings = result["timings"]
+            report = result["report"]
 
             st.markdown("---")
             st.metric("Images Extracted", total_images)
@@ -176,7 +179,7 @@ if st.button("Start Processing") and st.session_state.uploaded_files:
             st.write(f"RapidOCR : {timings['ocr']:.2f} sec")
             st.write(f"SmolVLM : {timings['caption']:.2f} sec")
             st.write(f"Markdown Merge : {timings['merge']:.2f} sec")
-
+            display_report(report)
         except Exception as e:
 
             st.error(f"Pipeline Failed\n\n{e}")
