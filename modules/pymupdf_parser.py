@@ -43,6 +43,7 @@ def parse_document(
         doc,
         write_images=True,
         image_path=str(assets_dir),
+        use_ocr=False,
     )
     # Replace markdown image links with placeholder
     markdown = re.sub(

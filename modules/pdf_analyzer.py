@@ -1,6 +1,6 @@
 from pathlib import Path
 import fitz
-
+import time
 
 # Images covering more than 10% of the page
 # are considered important.
@@ -35,24 +35,9 @@ def analyze_pdf(pdf_path):
         # Detect Tables
         # ----------------------------------
 
-        try:
-            tables = page.find_tables()
-            table_count = len(tables.tables)
+        has_table = detect_table_structure(page)
 
-        except Exception:
-
-            table_count = 0
-
-        fallback_table = likely_has_table(page)
-
-        has_table = (
-            table_count > 0
-            or fallback_table
-        )
-
-        if table_count == 0 and fallback_table:
-            table_count = 1
-
+        table_count = 1 if has_table else 0
 
         # ----------------------------------
         # Detect Images
@@ -144,9 +129,9 @@ def analyze_pdf(pdf_path):
 
     return analysis
 
-def likely_has_table(page):
+def detect_table_structure(page):
     """
-    Fallback heuristic for table detection.
+    table detection.
 
     Detects:
     - Borderless tables (aligned text columns)
@@ -184,8 +169,20 @@ def likely_has_table(page):
     except Exception:
         pass
 
-    # Strong indication of a ruled table
+    # --------------------------------
+    # Ruled table detection
+    # --------------------------------
+
+    # Mostly horizontal borders
     if horizontal_lines >= 3:
+        return True
+
+    # Mostly vertical borders
+    if vertical_lines >= 3:
+        return True
+
+    # Mixed borders
+    if horizontal_lines >= 2 and vertical_lines >= 2:
         return True
 
     # ----------------------------

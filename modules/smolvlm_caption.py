@@ -15,7 +15,7 @@ from modules.image_filter import should_caption
 
 CACHE_FILE = Path("caption_cache.json")
 
-MAX_IMAGE_SIZE = 512
+MAX_IMAGE_SIZE = 1024
 
 PHASH_THRESHOLD = 4
 
@@ -95,13 +95,17 @@ def resize_image(image_path):
 
 def generate_captions(assets_dir, ocr_results):
 
-    prompt = (
-    "Describe the technical content of this image in 1-2 concise sentences. "
-    "Include only the purpose and key elements of diagrams, charts, tables, "
-    "code, UI, architecture, or flowcharts. "
-    "Ignore decorative details. "
-    'Reply only "SKIP" if there is no useful technical content.'
-)
+    prompt = """
+You are an image captioning engine for document parsing.
+
+Describe the visible technical content in 1-2 concise sentences.
+
+Describe only what is visible.
+Do not infer, explain, speculate, ask questions, offer help, mention missing context, or use conversational language.
+
+If there is no meaningful technical content, reply exactly:
+SKIP
+"""
 
     assets_dir = Path(assets_dir)
 
@@ -225,4 +229,9 @@ def generate_captions(assets_dir, ocr_results):
     print(f"Total Time       : {total_end-total_start:.2f} sec")
     print("==============================")
 
-    return captions
+    return {
+        "captions": captions,
+        "generated": generated,
+        "cached": cached,
+        "skipped": skipped,
+    }
