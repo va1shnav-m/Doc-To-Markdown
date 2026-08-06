@@ -7,7 +7,7 @@ import imagehash
 import ollama
 from PIL import Image
 
-from modules.image_filter import should_caption
+from modules.image_filter import should_process
 
 # ------------------------------------
 # Configuration
@@ -141,7 +141,7 @@ SKIP
             }
         )
 
-        if not should_caption(image_path):
+        if not should_process(image_path):
             skipped += 1
             continue
 
@@ -184,7 +184,7 @@ SKIP
 
             #model="qwen2.5vl:3b",
             model="ahmadwaqar/smolvlm2-2.2b-instruct:latest",
-
+            # model="richardyoung/smolvlm2-2.2b-instruct:q4_k_m",
             messages=[
                 {
                     "role": "user",

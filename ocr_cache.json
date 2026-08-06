@@ -1,0 +1,112 @@
+{
+    "9e10e70fe0c09f67": {
+        "text": "21c\nF31399-01\nDecember2020",
+        "char_count": 26,
+        "line_count": 3
+    },
+    "a6844ac3d07e357e": {
+        "text": "Note:\nSimilarlySHschemacanbeinstalledindependently.\nSeeAlso:\nOracleDatabaseSecurityGuidefortheminimumpasswordrequirements",
+        "char_count": 121,
+        "line_count": 4
+    },
+    "ebe07b62c0b1e26a": {
+        "text": "HR\nDEPARTMENTS\nLOCATIONS\ndepartment_id\nlocation_id\ndepartment_name\nstreet_address\n个\nmanager_id\npostal_code\nJOB_HISTORY\nlocation_id\ncity\nstate_province\nemployee_id\nA\ncountry_id\nstart_date\nend_date\nEMPLOYEES\njob_id\nemployee_id\ndepartment_id\nfirst_name\nCOUNTRIES\nlast_name\ncountry_id\nemail\ncountry_name\nphone_number\nregion_id\nhire_date\nJOBS\njob_id\njob_id\nsalary\njob_title\ncommission_pct\nREGIONS\nmin_salary\nmanager_id\nregion_id\nmax_salary\ndepartment_id\nregion_name\nOE\nORDER_ITEMS\nORDERS\nCUSTOMERS\norder_id\norder_id\ncustomer_id\nline_item_id\norder_date\ncust_first_name\nproduct_id\norder_mode\ncustlast_name\nunit_price\ncustomer_id\ncust_address\nquantity\norder_status\nphone_numbers\nnls_language\norder_total\nsales_rep_id\nnls_territory\npromotion_id\ncredit_limit\ncust_email\nPRODUCT\naccount_mgr_id\nINFORMATION\nPRODUCT\ncust_geolocation\nDESCRIPTIONS\ndate_of_birth\nproduct_id\nproduct_id\nmarital_status\nproduct_name\nproduct_description\nlanguage_id\ngender\ntranslated_name\nincome_level\ncategory_id\nweight_class\ntranslated_description\nwarranty_period\nWAREHOUSES\nsupplier_id\nwarehouse_id\nproduct_status\nINVENTORIES\nwarehouse_spec\nlist_price\nproduct_id\nwarehouse_name\nmin_price\nwarehouse_id\nlocation_id\ncatalog_url\nquantity_on_hand\nwh_geo_location",
+        "char_count": 1223,
+        "line_count": 106
+    },
+    "a60d566e2e0b4e7c": {
+        "text": "PRODUCTINFORMATION\nproduct_id\nPM\nPRINTMEDIA\nproduct_id\nad_id\nad_composite\nad_sourcetext\nad_finaltext\nadfltextn\nadtextdocsntab\nad_photo\nad_graphic\nad_header",
+        "char_count": 155,
+        "line_count": 14
+    },
+    "d60fe026d82fa09f": {
+        "text": "SH\nPROMOTIONS\nTIMES\nCOSTS\npromo_id\ntime_id\nprod_id\npromo_name\nday_name\ntime_id\npromo_subcategory\nday_number_in_week\npromo_id\npromo_subcategory_id\nday_number_in_month\nchannel_id\npromo_category\ncalendar_week_number\nunit_cost\npromo_category_id\nfiscal_week_number\nunit_price\npromo_cost\nweek_ending_day\npromo_begin_date\nweek_ending_day_id\npromo_end_date\ncalendar_month_number\npromo_total\nfiscal_month_number\npromo_total_id\ncalendar_month_desc\nPRODUCTS\ncalendar_month_id\nfiscal_month_desc\nprod_id\nfiscal_month_id\nprod_name\ndays_in_cal_month\nprod_desc\nSALES\ndays_in_fis_month\nprod_subcategory\nprod_id\nend_of_cal_month\nprod_subcategory_id\ncust_id\nend_of_fis_month\nprod_subcategory_desc\ntime_id\ncalendar_month_name\nprod_category\nchannel_id\nfiscal_month_name\nprod_category_id\npromo_id\ncalendar_quarter_desc\nprod_category_desc\nquantity_sold\ncalendar_quarter_id\nprod_weight_class\namount_sold\nfiscal_quarter_desc\nprod_unit_of_measure\nfiscal_quarter_id\nprod_pack_size\ndays_in_cal_quarter\nsupplier_id\ndays_in_fis_quarter\nprod_status\nend_of_cal_quarter\nprod_list_price\nend_of_fis_quarter\nprod_min_price\nCUSTOMERS\ncalendar_quarter_number\nprod_total\ncust_id\nfiscal_quarter_number\nprod_total_id\ncust_first_name\ncalendar_year\nprod_src_id\ncust_last_name\ncalendar_year_id\nprod_eff_from\ncust_gender\nfiscal_year\nprod_eff_to\ncust_year_of_birth\nfiscal_year_id\nprod_valid\ncust_marital_status\ndays_in_cal_year\ncust_street_address\ndays_in_fis_year\ncust_postal_code\nend_of_cal_year\ncust_city\nend_offis_year\ncust_city_id\nCHANNELS\ncust_state_province\nchannel_id\ncust_state_province_id\nchannel_desc\ncountry_id\nCOUNTRIES\nchannel_class\ncust_main_phone_number\ncountry_id\nchannel_class_id\ncust_income_level\ncountry_iso_code\nchannel_total\ncust_credit_limit\ncountry_name\nchannel_total_id\ncust_email\ncountry_subregion\ncust_total\ncountry_subregion_id\ncust_total_id\ncountry_region\ncust_src_id\ncountry_region_id\ncust_eff_from\ncountry_total\ncust_eff_to\ncountry_total_id\ncust_valid\ncountry_name_hist",
+        "char_count": 1954,
+        "line_count": 132
+    },
+    "879b4e8513f0ec93": {
+        "text": "co\nORDER_ITEMS\nORDERS\norder_id\norder_id\nline_item_id\norder_datetime\nproduct_id\ncustomer_id\nunit_price\norder_status\nquantity\nstore_id\nshipment_id\nPRODUCTS\nSHIPMENTS\nproduct_id\nshipment_id\nproduct_name\nstore_id\nunit_price\ncustomer_id\nproduct_details\ndelivery_address\nproduct_image\nshipment_status\nimage_mime_type\nimage_charset\nimage_filename\nimage_last_updated\nSTORES\nstore_id\nstore_name\nweb_address\nphysical_address\nlatitude\nINVENTORY\nlongitude\nlogo\ninventory_id\nlogo_mime_type\nCUSTOMERS\nstore_id\nlogo_charset\ncustomer_id\nproduct_id\nlogo_filename\nemail_address\nproduct_inventory\nlogo_last_updated\nfull_name",
+        "char_count": 605,
+        "line_count": 51
+    },
+    "8303c58ff8c79c71": {
+        "text": "TN\nTM\nEmpowered Networks\nGiveBack",
+        "char_count": 33,
+        "line_count": 4
+    },
+    "8285032bc54beb7f": {
+        "text": "GET\n/api/campaigns\nReturninfo forcampaigns.Filters can beapplied.\nDocumentatlon\nSandbox\nFilters\nName\nInformation\npage\nDescriotion\nOptional.Pageofresultset.Eachpagecontains1oorecords.\ncreated_since\nDescription Optional.Return campaigns created afterthe date date in format YyyY-MM-DD (string)\ncreated_before\nDescription Optional.Return campaigns created before the date date in format Yyyy-MM-DD (string)",
+        "char_count": 403,
+        "line_count": 15
+    },
+    "bb03c58ff0c4e878": {
+        "text": "360\nEmpowered Networks Give Back",
+        "char_count": 32,
+        "line_count": 2
+    },
+    "8a079d1b24674bb7": {
+        "text": "GET\n/api/campaigns\nReturn info for campaigns.Filters can be applied\nDocumentation\nSandbox\nInput\nHeaders\nContent\nx-api-key\nContent set here\nFilters\nINuQeqoelZ1kmLWRPcTh\nwilloverridethe\npage\nOptional.Page ofresult\nparameters that do\nNewheader\ncreated_since\nOptional.Return campa\nContent-Type\ncreated_before\nOptional.Return campa\nValue\nSetheader\nReplaces header\nifset\nTry!",
+        "char_count": 369,
+        "line_count": 27
+    },
+    "9303c48ff8c6f878": {
+        "text": "360\nEmpowered Networks Give Back",
+        "char_count": 32,
+        "line_count": 2
+    },
+    "8f02000a937f7f9f": {
+        "text": "GET\n/api/campaigns/{id}\nReturn info fora single campaign\nDocumentatlon\nSandbox\nRequirements\nName\nRequirement\nType\nDescription\nid\n1d+\ninteger\ncampaignid",
+        "char_count": 151,
+        "line_count": 14
+    },
+    "ca069d5b06074bf7": {
+        "text": "GET\n/api/campaigns/{id}\nReturn info fora single campaign\nDocumentation\nSandbox\nInput\nHeaders\nContent\nx-api-key\nContent set here\nRequirements\n<<your-API-key>>\nwilloverridethe\nid\nparameters thatdo\nNewheader\nContent-Type\nValue\nSetheader\nReplacesheader\nifset\nTry!",
+        "char_count": 259,
+        "line_count": 22
+    },
+    "8a07851b24e74b7f": {
+        "text": "GET\n/api/campaigns\nReturn info for campaigns.Filters can be applied\nDocumentation\nSandbox\nInput\nHeaders\nContent\nx-api-key\nContent set here\nFilters\n<<your-APl-key>>\nwilloverride the\npage\nOptional.Pageof result\nparametersthatdo\nNewheader\ncreated_since\n2017-08-011\nContent-Type\ncreated_before\nOptional.Return campa\nValue\nSetheader\nReplacesheader\nifset\nTry!",
+        "char_count": 353,
+        "line_count": 27
+    },
+    "a687cb231569c3d3": {
+        "text": "GET\n/api/donations\nReturninfo for donations.Filters canbe applied.\nDocumentatlon\nSandbox\nFilters\nName\nInformation\npage\nDescription Optional.Page ofresult set.Each page contains 1oorecords.\ncampaign_id\nDescription Optional.Getdonations forthis campaign(integer)\nuser_id\nDescription Optional.Get donations made by thisuser(integer)\nstart_date\nDescription Optional.Return donations made after the date date in format YyYy-MM-DD(string)\nend_date\nDescription Optlonal.Return donations made until the date date in format YYYY-MM-DD (string)",
+        "char_count": 534,
+        "line_count": 18
+    },
+    "820795196661cbff": {
+        "text": "GET\n/api/donations\nReturn info for donations.Filters can be applied\nDocumentation\nSandbox\nInput\nHeaders\nContent\nx-api-key\nContent set here\nFilters\n<<your-API-key>>\nwilloverridethe\npage\nOptional.Page of result\nparameters that do\nNewheader\ncampaign_id\nOptional.Get donations\nContent-Type\nuser_id\n1102\nValue\nstart_date\nOptional.Return donati\nSetheader\nReplacesheader\nifset\nend_date\nOptional.Return donati\nTry!",
+        "char_count": 406,
+        "line_count": 31
+    },
+    "c0b59a139b1b9b2d": {
+        "text": "GET\n/api/users\nDocumentation\nSandbox\nInput\nFilters\npage\n=Optional.Page of result set Each page contains 100 records\napproved\n=Optional.Approval status（1 or 0）\nbad_emall\n=Optional. Email not usable (1 or 0)\nclient_id\n=Optional.Client ID（integer)\ndob_day\n=Optional. Date of birth day(integer)\ndob_month\nOptional.Date of birth month (integer)\ndob_year\n=Optional. Date of birth year(integer)\nenabled\n=Optional. Account enabled status (1 or 0)\nfist_login\n=Optional. First time login（1or0）\nhard_bounce\n=Optional. Number ofemail hard bounces (integer)\nisConfirmed\n=Optional.Email address is confirmed （1 or 0）\nisPrimary\n=Optional. Primary client admin (1 or. 0)\nis_import_user\nOptional.Account created by import(1 or 0）\nsof_bounce\n=Optional.Number of emall soft bounces(integer)\nterms_and_conditions\n=Optional. Terms and conditions agreed(1or 0)\nyear_graduated\n=Optional. Graduation year (integer)\nemail\n=Optional. Email- exact match (string)\nfirst_name\n=Optional.First name-exact match （string)\nlast_name\nOptional.Last name-exact match（string)\nhome_city\n=Optional.Home city-exact match (string)\nhome_country\n=Optional. Home country 2-letter postal abbreviation - exact me\nhome_state\nOptional.Home state 2-letter postal abbreviation-exact matc\nwork_city\nOptional. Work city-exact match（string)\nwork_country\n=Optional.Work country 2-letter postal abbreviation-exactma\nwork_state\n=Optional. Work state 2-letter postal abbreviation - exact match\nactivated_at\n=Optional. Account activation date in format YYYY-MM-DD. Ca\ncreatedAt\n=Optional.Account creation date in format YYYY-MM-DD.Can\nlast_login\n=Optional.Last login date in format YYYY-MM-DD.Can be par\nupdatedAt\n=Optional. Acount updated date in format YYYY-MM-DD. Can\ncompany\n=Optional. Company name in current or past positions. Can be\ntitle\n=Optional.Job title occupied in current orpastpositions Can b\nstudy_area\n=Optional.Study area. Can be partial match （string)\nindustry\n=Optional.Industry.Can be partial match （string)\nskil\n=Optional. Skill. Can be partial match (string)\nTryl",
+        "char_count": 2027,
+        "line_count": 75
+    },
+    "810706307954feff": {
+        "text": "POST\n/api/users\nDocumentation\nSandbox\nInput\nHeaders\nParameters\nx-api-key\nINuQeqoelZ1kmLWRPcTK\nemail\nString\nexample@gmail.com\nNewheader\nfirstname\nString\nVito\nlast_name\nString\nCorleone\nenabled\nType\ngroups\nType\n[\"user\"]",
+        "char_count": 216,
+        "line_count": 24
+    },
+    "a410daee97876c78": {
+        "text": "Headers\nContent\nx-api-key\nINuQeqoelZ1kmLWRPcTK\n{\"email\":\"ptest@gmail.com\"，\"first_name\":\"Palash\"\n\"last_name\":\"Gore\",\"enabled\":\"1\",\"groups\":\nNewheader\n[\"user\"]}\nContent-Type\nValue\nSetheader\nReplacesheaderifset",
+        "char_count": 207,
+        "line_count": 12
+    },
+    "ca07955f044ba773": {
+        "text": "GET\n/api/users/{id)\nReturn info fora single user\nDocumentation\nSandbox\nHeaders\nContent\nx-api-key\nContent set here\nRequirements\nwilloverride the\nidl\n234063\nparameters that do\nINuQegoeIZ1kmLWRPcTh\nContent-Type\nNewheader\nValue\nSetheader\nReplaces\nheaderif set\nTry!",
+        "char_count": 260,
+        "line_count": 22
+    },
+    "ca07954f145b63b5": {
+        "text": "PUT\n/api/users/{id)\nUpdate user\nDocumentation\nSandbox\nInput\nHeaders\nContent\nContent-Type\n{\"about\":\"New\nRequirements\napplication/json\ndescription of this\nid\n234063\nuserin the about\nx-api-key\nfield.\",\"activated_at\nINuQeqoeIZ1kmLWRPcT\nContent-Type\nNewheader\napplication/json\nSetheader\nReplaces header\nifset\nTry!",
+        "char_count": 308,
+        "line_count": 26
+    },
+    "bb11946bc4c46fe2": {
+        "text": "Response Body[Raw]\nsuccess\":\n\"Updated\nuser\nid=234063\n→",
+        "char_count": 54,
+        "line_count": 6
+    }
+}

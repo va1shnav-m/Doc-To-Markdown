@@ -1,6 +1,16 @@
 from pathlib import Path
 
 from rapidocr_onnxruntime import RapidOCR
+from modules.ocr_cache import (
+    load_cache,
+    save_cache,
+)
+from modules.image_filter import should_process
+
+from modules.smolvlm_caption import (
+    image_hash,
+    find_similar_hash,
+)
 
 
 def extract_ocr_text(assets_dir):
@@ -30,7 +40,10 @@ def extract_ocr_text(assets_dir):
     assets_dir = Path(assets_dir)
 
     ocr_engine = RapidOCR()
+    cache = load_cache()
 
+    cache_hits = 0
+    ocr_skipped = 0
     results = {}
 
     image_files = sorted(
@@ -43,6 +56,38 @@ def extract_ocr_text(assets_dir):
     )
 
     for image_path in image_files:
+
+        # ---------------------------------------
+        # Image Filter
+        # ---------------------------------------
+
+        if not should_process(image_path):
+
+            ocr_skipped += 1
+
+            continue
+
+
+        # ---------------------------------------
+        # pHash Cache
+        # ---------------------------------------
+
+        current_hash = image_hash(image_path)
+
+        similar_hash = find_similar_hash(
+            current_hash,
+            cache
+        )
+
+        if similar_hash is not None:
+
+            results[image_path.name] = cache[similar_hash]
+
+            cache_hits += 1
+
+            print(f"Using cached OCR for {image_path.name}")
+
+            continue
 
         ocr_result, _ = ocr_engine(
             str(image_path)
@@ -74,17 +119,25 @@ def extract_ocr_text(assets_dir):
 
         }
 
-        # ---------------------------------------
-        # Count images that contain OCR text
-        # ---------------------------------------
+        cache[str(current_hash)] = results[image_path.name]
 
-        ocr_image_count = sum(
-            1
-            for item in results.values()
-            if item["char_count"] > 0
-        )
+    # ---------------------------------------
+    # Count images that contain OCR text
+    # ---------------------------------------
 
-        return {
-            "results": results,
-            "ocr_image_count": ocr_image_count,
-        }
+    ocr_image_count = sum(
+        1
+        for item in results.values()
+        if item["char_count"] > 0
+    )
+    save_cache(cache)
+    return {
+
+        "results": results,
+
+        "ocr_image_count": ocr_image_count,
+
+        "cache_hits": cache_hits,
+
+        "skipped": ocr_skipped,
+    }
