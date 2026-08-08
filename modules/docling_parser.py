@@ -35,7 +35,7 @@ def parse_document(input_path, output_dir, assets_dir, page_name=None):
     # ----------------------------------------
 
     pipeline_options = PdfPipelineOptions()
-
+    #pipeline_options.do_ocr = False
     pipeline_options.images_scale = 2
 
     pipeline_options.generate_picture_images = True
