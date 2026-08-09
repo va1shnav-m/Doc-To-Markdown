@@ -1,0 +1,9 @@
+services:
+  doc-parser:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: doc-parser
+    ports:
+      - "8501:8501"
+    restart: unless-stopped  
