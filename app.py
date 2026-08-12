@@ -8,8 +8,8 @@ from pipelines.docling_pipeline import process_docling_pipeline
 from pipelines.hybrid_pipeline import process_hybrid_pipeline
 from modules.utils import clear_folder
 from modules.reporting import display_report
-
-
+from benchmark.benchmark import Benchmark
+from benchmark.report_generator import generate_benchmark_report
 # ----------------------------
 # Folders
 # ----------------------------
@@ -103,7 +103,16 @@ if st.button("Start Processing") and st.session_state.uploaded_files:
 
         st.success(f"Uploaded : {uploaded_path.name}")
 
+    batch_start = time.perf_counter()
     for document_index, uploaded_path in enumerate(uploaded_paths, start=1):
+
+        benchmark = Benchmark()
+
+        benchmark.document_name = uploaded_path.name
+        benchmark.document_type = uploaded_path.suffix.lower()
+        benchmark.file_size_mb = (
+            uploaded_path.stat().st_size / (1024 * 1024)
+        )
 
         clear_folder("temp_assets")
         clear_folder("temp_chunks")
@@ -158,7 +167,61 @@ if st.button("Start Processing") and st.session_state.uploaded_files:
             final_markdown = result["markdown"]
             total_images = result["image_count"]
             timings = result["timings"]
+
+            # Basic benchmark info
+            benchmark.total_time = timings["total"]
+            benchmark.images_detected = total_images
+
+            # Stage timings
+            benchmark.stage_times = {
+                "analysis": timings["analysis"],
+                "chunking": timings["chunking"],
+                "parsing": timings["parsing"],
+                "ocr": timings["ocr"],
+                "captioning": timings["caption"],
+                "markdown_merge": timings["merge"],
+            }
+
+            # Processing report
             report = result["report"]
+
+            # Caption timings
+            benchmark.caption_times = result["caption_times"]
+
+
+            benchmark.images_processed = (
+                benchmark.images_detected - benchmark.images_skipped
+            )
+            
+            # OCR metrics
+            benchmark.ocr_images = report.ocr_images
+            benchmark.ocr_cache_hits = report.ocr_cache_hits
+            benchmark.images_skipped = report.ocr_skipped
+            benchmark.ocr_failed = report.ocr_failed
+            benchmark.ocr_characters = report.ocr_characters
+
+            # Caption metrics
+            benchmark.caption_images = (
+                report.captions_generated
+                + report.captions_cached
+                + report.captions_skipped
+            )
+
+            benchmark.caption_success = report.captions_generated
+            benchmark.caption_failed = report.captions_failed
+            benchmark.caption_skipped = report.captions_skipped
+            benchmark.caption_cache_hits = report.captions_cached
+            benchmark.caption_cache_misses = report.captions_generated
+
+            # Generate report
+            benchmark_html = generate_benchmark_report(benchmark)
+            # Download button for Report
+            st.download_button(
+                label="Download Benchmark Report",
+                data=benchmark_html,
+                file_name=f"{benchmark.document_name}_benchmark.html",
+                mime="text/html",
+            )
 
             st.markdown("---")
             st.metric("Images Extracted", total_images)
@@ -183,7 +246,15 @@ if st.button("Start Processing") and st.session_state.uploaded_files:
         except Exception as e:
 
             st.error(f"Pipeline Failed\n\n{e}")
-            
+    batch_time = time.perf_counter() - batch_start
+
+    st.markdown("---")
+    st.subheader("Batch Performance")
+
+    st.metric(
+        "Total Batch Processing Time",
+        f"{batch_time:.2f} sec"
+    )        
     final_batch = combine_final_documents(OUTPUT_DIR)
 
     st.success("Combined markdown created.")

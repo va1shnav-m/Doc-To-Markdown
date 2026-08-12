@@ -9,6 +9,24 @@ from docling.document_converter import (
 
 from docling_core.types.doc import PictureItem
 
+# ----------------------------------------
+# Create Docling Converter ONCE
+# ----------------------------------------
+
+pipeline_options = PdfPipelineOptions()
+
+pipeline_options.do_ocr = False
+pipeline_options.images_scale = 2
+pipeline_options.generate_picture_images = True
+pipeline_options.generate_page_images = False
+
+converter = DocumentConverter(
+    format_options={
+        InputFormat.PDF: PdfFormatOption(
+            pipeline_options=pipeline_options
+        )
+    }
+)
 
 def parse_document(input_path, output_dir, assets_dir, page_name=None):
     """
@@ -29,46 +47,6 @@ def parse_document(input_path, output_dir, assets_dir, page_name=None):
 
     output_dir.mkdir(parents=True, exist_ok=True)
     assets_dir.mkdir(parents=True, exist_ok=True)
-
-    # ----------------------------------------
-    # PDF Pipeline Options
-    # ----------------------------------------
-
-    pipeline_options = PdfPipelineOptions()
-    #pipeline_options.do_ocr = False
-    pipeline_options.images_scale = 2
-
-    pipeline_options.generate_picture_images = True
-
-    pipeline_options.generate_page_images = False
-
-    
-
-    # ----------------------------------------
-    # Create Converter
-    # ----------------------------------------
-
-    if input_path.suffix.lower() == ".pdf":
-
-        converter = DocumentConverter(
-
-            format_options={
-
-                InputFormat.PDF: PdfFormatOption(
-
-                    pipeline_options=pipeline_options
-
-                )
-
-            }
-
-        )
-
-    else:
-
-        # DOCX
-
-        converter = DocumentConverter()
 
     # ----------------------------------------
     # Convert Document

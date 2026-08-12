@@ -96,9 +96,8 @@ def merge_markdown(
         replacement.append("")
 
         replacement.append(
-            f"![{image_name}](assets/{image_name})"
+            f"![{image_name}](../temp_assets/{image_name})"
         )
-
         if caption:
 
             replacement.append("")

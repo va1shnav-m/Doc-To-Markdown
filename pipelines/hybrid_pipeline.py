@@ -221,7 +221,10 @@ def process_hybrid_pipeline(
     ocr_results = ocr_result["results"]
 
     report.ocr_images = ocr_result["ocr_image_count"]
-
+    report.ocr_cache_hits = ocr_result["cache_hits"]
+    report.ocr_skipped = ocr_result["skipped"]
+    report.ocr_failed = ocr_result["ocr_failed"]
+    report.ocr_characters = ocr_result["total_characters"]
     ocr_end = time.perf_counter()
     ocr_time = ocr_end - ocr_start
     ui.info(
@@ -229,7 +232,7 @@ def process_hybrid_pipeline(
     )
 
     # ----------------------------
-    # Qwen Captioning
+    # SmolVLM Captioning
     # ----------------------------
 
     ui.subheader("Image Captioning")
@@ -246,7 +249,8 @@ def process_hybrid_pipeline(
     report.captions_generated = caption_result["generated"]
     report.captions_cached = caption_result["cached"]
     report.captions_skipped = caption_result["skipped"]
-
+    report.captions_failed = caption_result["failed"]
+    caption_times = caption_result["caption_times"]
     caption_end = time.perf_counter()
     caption_time = caption_end - caption_start
     ui.info(
@@ -302,5 +306,6 @@ def process_hybrid_pipeline(
             "merge": merge_time,
             "total": pipeline_end - pipeline_start,
         },
-        "report": report
+        "report": report,
+        "caption_times": caption_times,
     } 

@@ -16,11 +16,14 @@ class ProcessingReport:
     tables_found: int = 0
     images_extracted: int = 0
     ocr_images: int = 0
-
+    ocr_cache_hits: int = 0
+    ocr_skipped: int = 0
+    ocr_failed: int = 0
+    ocr_characters: int = 0
     captions_generated: int = 0
     captions_cached: int = 0
     captions_skipped: int = 0
-
+    captions_failed: int = 0
     analysis_time: float = 0.0
     chunking_time: float = 0.0
     parsing_time: float = 0.0

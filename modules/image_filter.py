@@ -72,6 +72,6 @@ def should_process(image_path):
     # Otherwise
     # ---------------------------------------------------
 
-    print(f"{image_path.name}: Send to SmolVLM")
+    print(f"{image_path.name}: Send For Image Processing")
 
     return True
