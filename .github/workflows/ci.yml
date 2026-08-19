@@ -5,9 +5,9 @@ on:
     branches:
       - main
       - devops/cloud-platform
-    pull_request:
-      branches:
-       - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build:
