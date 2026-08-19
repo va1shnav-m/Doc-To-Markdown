@@ -1,10 +1,10 @@
 <div align="center">
 
-# 📄 Doc-To-Markdown
+# 📄 hybrid-document-parser
 
-**Intelligent document-to-Markdown converter optimized for RAG workflows**
+**Intelligent hybrid document-to-Markdown parser optimized for RAG workflows**
 
-[![CI](https://github.com/va1shnav-m/Doc-To-Markdown/actions/workflows/ci.yml/badge.svg)](https://github.com/va1shnav-m/Doc-To-Markdown/actions/workflows/ci.yml)
+[![CI](https://github.com/va1shnav-m/hybrid-document-parser/actions/workflows/ci.yml/badge.svg)](https://github.com/va1shnav-m/hybrid-document-parser/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-green)
@@ -18,7 +18,7 @@ Convert **PDF**, **DOC**, and **DOCX** files into clean, structured Markdown —
 ## ✨ Features
 
 - **Multi-format support** — PDF, DOC, and DOCX input files
-- **Hybrid parsing pipeline** — Intelligently routes pages to Docling (complex pages with tables/images) or PyMuPDF (standard text pages) for optimal accuracy
+- **Hybrid parsing pipeline** — Intelligently routes pages to Docling (complex pages with tables/images) or PyMuPDF (standard text pages) for optimal speed and accuracy
 - **Adaptive chunking** — Splits large PDFs into parser-aware chunks to prevent memory issues
 - **AI-powered image analysis** — Classifies images as *technical* or *general*, extracts text, and generates structured descriptions using a Vision-Language Model (VLM)
 - **Perceptual hash caching** — Deduplicates image analysis using pHash to avoid redundant VLM calls
@@ -90,8 +90,8 @@ DOCX ─────────────────────────
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/va1shnav-m/Doc-To-Markdown.git
-cd Doc-To-Markdown
+git clone https://github.com/va1shnav-m/hybrid-document-parser.git
+cd hybrid-document-parser
 ```
 
 ### 2. Create a virtual environment
@@ -177,8 +177,8 @@ This starts the application on port **8501**.
 ### Build manually
 
 ```bash
-docker build -t doc-to-markdown .
-docker run -p 8501:8501 doc-to-markdown
+docker build -t hybrid-document-parser .
+docker run -p 8501:8501 hybrid-document-parser
 ```
 
 ---
@@ -186,7 +186,7 @@ docker run -p 8501:8501 doc-to-markdown
 ## 📁 Project Structure
 
 ```
-Doc-To-Markdown/
+hybrid-document-parser/
 ├── main.py                  # CLI entry point
 ├── requirements.txt         # Python dependencies
 ├── Dockerfile               # Container image definition
@@ -292,4 +292,3 @@ This project is licensed under the **MIT License** — see the [LICENSE](LICENSE
 Made with ❤️ by [va1shnav-m](https://github.com/va1shnav-m)
 
 </div>
-
