@@ -29,64 +29,49 @@ MODEL = "qwen2.5vl:3b"
 ANALYSIS_PROMPT = """
 You are a document image analyzer for a technical document parsing system.
 
-Analyze the image and produce structured markdown output.
+Analyze the image and produce TWO sections of output.
 
-STEP 1: Classify the image as ONE of these types:
-- diagram (system design, architecture, component diagrams)
-- flowchart (process flows, decision trees, sequence diagrams)
-- table (data tables, comparison matrices)
-- chart (bar charts, pie charts, line graphs, plots)
-- screenshot (UI screenshots, terminal output, code snippets)
-- photo (photographs, real-world images)
-- illustration (icons, logos, decorative art)
-- other
+STEP 1: Classify the image as ONE of:
+- technical: The image has meaningful text content, blocks, connectors, labels, tables, charts, diagrams, flowcharts, architecture, code, UI elements, or any structured information.
+- general: The image is a photo, illustration, icon, logo, decorative element, or has no meaningful text or structure.
 
-STEP 2: Produce output based on the type.
+STEP 2: Produce output in this EXACT format:
 
-FOR DIAGRAMS AND ARCHITECTURE:
-- List all visible components/nodes with their labels
-- Describe all connections between components using arrows (→)
-- Preserve grouping and hierarchy (e.g. components inside a boundary)
-- Include any text labels on connections or arrows
-- Format as structured markdown with headers and bullet lists
+**Category:** [technical or general]
 
-FOR FLOWCHARTS AND PROCESS FLOWS:
-- List each step/node in order
-- Show the flow direction with arrows (→)
-- Include decision points with their conditions
-- Show branches clearly
+## Text Extract
 
-FOR TABLES:
-- Reproduce the table as a markdown table
-- Preserve all headers and cell values
+[For TECHNICAL images:]
+- Extract ALL visible text from the image
+- Preserve the spatial layout and relationships between text elements
+- If there are blocks/boxes with text, show them as bullet points or sections
+- If there are arrows or connectors between blocks, show them using → notation
+- If there is a table, reproduce it as a markdown table
+- If there is a hierarchy or grouping, use indentation to show it
+- The goal is to convert the visual text layout into meaningful structured markdown
 
-FOR CHARTS:
-- Describe the chart type
-- List the axes labels and data series
-- Mention key data points or trends that are clearly visible
-- Do NOT invent values that are not readable
+[For GENERAL images:]
+- Write: No text content.
 
-FOR SCREENSHOTS AND UI:
-- Describe the application or interface shown
-- List key visible content, menus, or data
-- Include any important visible text
+## Description
 
-FOR PHOTOS, ILLUSTRATIONS, AND OTHER:
-- Provide a 1-2 sentence description of what is visible
+[For TECHNICAL images:]
+- Explain what this image represents and its purpose
+- Describe the key concepts, relationships, or processes shown
+- If it shows a system architecture, explain what the system does
+- If it shows a process, explain the flow
+- If it shows data, explain what the data means
+- Adapt the depth of description to the complexity of the image
 
-OUTPUT FORMAT (always start with this exact line):
-
-**Type:** [type]
-
-[structured content based on the type above]
+[For GENERAL images:]
+- Provide a brief 1-2 sentence description of what is visible
 
 IMPORTANT RULES:
 - Do NOT invent information that is not clearly visible
-- Do NOT describe colors or visual styling unless they convey meaning
 - Do NOT add conversational text like "Here is..." or "I can see..."
 - Preserve ALL visible text labels exactly as written
-- For technical diagrams, RELATIONSHIPS are more important than descriptions
-- Keep your response concise and structured
+- The Text Extract section should capture EVERY piece of text in the image
+- The Description section should explain the MEANING and CONTEXT
 """
 
 # ------------------------------------
@@ -165,49 +150,86 @@ def resize_image(image_path):
 
 def parse_analysis_response(response_text):
     """
-    Parse the VLM response into type and markdown content.
+    Parse the VLM response into category, text extract,
+    and description.
 
     Returns
     -------
     dict
-        {"type": str, "markdown": str}
+        {
+            "category": "technical" or "general",
+            "text_extract": str,
+            "description": str,
+        }
     """
 
     text = response_text.strip()
 
-    image_type = "other"
-    markdown = text
+    category = "general"
+    text_extract = ""
+    description = ""
 
-    # Extract type from the **Type:** line
-    for line in text.splitlines():
+    # ------------------------------------------
+    # Extract category from **Category:** line
+    # ------------------------------------------
 
-        stripped = line.strip()
+    lines = text.splitlines()
 
-        if stripped.lower().startswith("**type:**"):
+    for line in lines:
 
-            type_value = stripped.split(":", 1)[1]
-            type_value = type_value.strip().strip("*").strip().lower()
+        stripped = line.strip().lower()
 
-            # Normalize to known types
-            known_types = [
-                "diagram", "flowchart", "table",
-                "chart", "screenshot", "photo",
-                "illustration", "other",
-            ]
+        if stripped.startswith("**category:**"):
 
-            for known in known_types:
-                if known in type_value:
-                    image_type = known
-                    break
+            value = stripped.split(":", 1)[1]
+            value = value.strip().strip("*").strip()
 
-            # Remove the Type line from markdown
-            markdown = text.replace(line, "", 1).strip()
+            if "technical" in value:
+                category = "technical"
+            else:
+                category = "general"
 
             break
 
+    # ------------------------------------------
+    # Extract sections by heading
+    # ------------------------------------------
+
+    current_section = None
+    text_extract_lines = []
+    description_lines = []
+
+    for line in lines:
+
+        stripped = line.strip().lower()
+
+        # Detect section headers
+        if stripped.startswith("## text extract"):
+            current_section = "text_extract"
+            continue
+
+        elif stripped.startswith("## description"):
+            current_section = "description"
+            continue
+
+        # Skip the category line
+        elif stripped.startswith("**category:**"):
+            continue
+
+        # Collect content into sections
+        if current_section == "text_extract":
+            text_extract_lines.append(line)
+
+        elif current_section == "description":
+            description_lines.append(line)
+
+    text_extract = "\n".join(text_extract_lines).strip()
+    description = "\n".join(description_lines).strip()
+
     return {
-        "type": image_type,
-        "markdown": markdown,
+        "category": category,
+        "text_extract": text_extract,
+        "description": description,
     }
 
 
@@ -233,8 +255,9 @@ def analyze_images(assets_dir):
         {
             "results": {
                 "image_1.png": {
-                    "type": "diagram",
-                    "markdown": "..."
+                    "category": "technical",
+                    "text_extract": "...",
+                    "description": "..."
                 },
                 ...
             },
@@ -341,7 +364,7 @@ def analyze_images(assets_dir):
                     "temperature": 0,
                     "top_p": 0.9,
                     "repeat_penalty": 1.05,
-                    "num_predict": 512,
+                    "num_predict": 800,
                 }
             )
 
@@ -355,8 +378,9 @@ def analyze_images(assets_dir):
 
             # Store a failed marker so merge can still embed the image
             results[image_path.name] = {
-                "type": "other",
-                "markdown": "",
+                "category": "general",
+                "text_extract": "",
+                "description": "",
                 "failed": True,
             }
 
@@ -377,7 +401,7 @@ def analyze_images(assets_dir):
         analysis_times[image_path.name] = analysis_time
 
         print(
-            f"{image_path.name} [{parsed['type']}] "
+            f"{image_path.name} [{parsed['category']}] "
             f"analyzed in {analysis_time:.2f} seconds"
         )
 

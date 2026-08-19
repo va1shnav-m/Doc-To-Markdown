@@ -75,14 +75,29 @@ def merge_markdown(
 
         replacement.append("")
 
-        # Add structured analysis if available
-        analysis_markdown = (
-            analysis.get("markdown", "").strip()
+        # Add text extract if available
+        text_extract = (
+            analysis.get("text_extract", "").strip()
             if analysis else ""
         )
 
-        if analysis_markdown:
-            for line in analysis_markdown.splitlines():
+        if text_extract and text_extract.lower() != "no text content.":
+            replacement.append("> **Text Extract:**")
+            replacement.append(">")
+            for line in text_extract.splitlines():
+                replacement.append(f"> {line}")
+            replacement.append("")
+
+        # Add description if available
+        description = (
+            analysis.get("description", "").strip()
+            if analysis else ""
+        )
+
+        if description:
+            replacement.append("> **Description:**")
+            replacement.append(">")
+            for line in description.splitlines():
                 replacement.append(f"> {line}")
             replacement.append("")
 
