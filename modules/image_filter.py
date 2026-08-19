@@ -10,7 +10,7 @@ MAX_ASPECT_RATIO = 15      # Skip very long/thin images
 MIN_OCR_CHARACTERS = 15
 
 
-def should_caption(image_path):
+def should_process(image_path):
     """
     Decide whether an image should be sent to SmolVLM.
 
@@ -72,6 +72,6 @@ def should_caption(image_path):
     # Otherwise
     # ---------------------------------------------------
 
-    print(f"{image_path.name}: Send to SmolVLM")
+    print(f"{image_path.name}: Send For Image Processing")
 
     return True

@@ -1,19 +1,26 @@
 from typing import List, Dict
 
-MAX_CHUNK_SIZE = 20
+MAX_CHUNK_SIZE = 10
+
+# Docling is memory-heavy (images, tables, OCR).
+# Smaller chunks prevent bad_alloc crashes.
+MAX_DOCLING_CHUNK_SIZE = 5
 
 
 def create_execution_plan(analysis: List[Dict]):
     """
     Creates parser-aware execution chunks.
 
+    Uses smaller chunks for Docling (image/table heavy)
+    to prevent memory exhaustion (bad_alloc).
+
     Returns:
     [
         {
             "parser": "pymupdf",
             "start_page": 1,
-            "end_page": 20,
-            "page_count": 20
+            "end_page": 10,
+            "page_count": 10
         },
         ...
     ]
@@ -35,10 +42,16 @@ def create_execution_plan(analysis: List[Dict]):
 
         page_number = analysis[i]["page"]
 
+        # Pick the right chunk limit based on parser
+        if current_parser == "docling":
+            chunk_limit = MAX_DOCLING_CHUNK_SIZE
+        else:
+            chunk_limit = MAX_CHUNK_SIZE
+
         # same parser and within chunk size
         if (
             parser == current_parser
-            and current_count < MAX_CHUNK_SIZE
+            and current_count < chunk_limit
         ):
             current_count += 1
 

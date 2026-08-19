@@ -1,5 +1,4 @@
 from pathlib import Path
-import streamlit as st
 import time
 
 from modules.adaptive_chunker import create_execution_plan
@@ -8,11 +7,10 @@ from modules.pdf_analyzer import analyze_pdf
 from modules.docling_parser import parse_document
 from modules.pymupdf_parser import parse_document as parse_document_pymupdf
 from modules.markdown_combiner import combine_markdowns
-from modules.rapidocr_parser import extract_ocr_text
-from modules.smolvlm_caption import generate_captions
+from modules.image_analyzer import analyze_images
 from modules.markdown_merge import merge_markdown
 from modules.reporting import ProcessingReport
-from modules.ui import StreamlitUI
+from modules.ui import ConsoleUI
 
 
 
@@ -29,11 +27,10 @@ def process_hybrid_pipeline(
     analysis_time = 0.0
     chunking_time = 0.0
     parsing_time = 0.0
-    ocr_time = 0.0
-    caption_time = 0.0
+    image_analysis_time = 0.0
     merge_time = 0.0
     if ui is None:
-        ui = StreamlitUI()
+        ui = ConsoleUI()
     report = ProcessingReport()
 
     report.input_file = converted_path.name
@@ -207,50 +204,29 @@ def process_hybrid_pipeline(
     progress.empty()    
 
     # ----------------------------
-    # RapidOCR
+    # Image Analysis (Unified)
     # ----------------------------
 
-    ui.subheader("RapidOCR")
+    ui.subheader("Image Analysis")
 
-    ocr_start = time.perf_counter()
+    ia_start = time.perf_counter()
 
-    ocr_result = extract_ocr_text(
+    ia_result = analyze_images(
         temp_assets_dir
     )
 
-    ocr_results = ocr_result["results"]
+    image_analysis = ia_result["results"]
 
-    report.ocr_images = ocr_result["ocr_image_count"]
+    report.images_analyzed = ia_result["generated"]
+    report.images_cached = ia_result["cached"]
+    report.images_skipped = ia_result["skipped"]
+    report.images_failed = ia_result["failed"]
 
-    ocr_end = time.perf_counter()
-    ocr_time = ocr_end - ocr_start
+    ia_end = time.perf_counter()
+    image_analysis_time = ia_end - ia_start
+
     ui.info(
-        f"RapidOCR Time : {ocr_time:.2f} seconds"
-    )
-
-    # ----------------------------
-    # Qwen Captioning
-    # ----------------------------
-
-    ui.subheader("Image Captioning")
-
-    caption_start = time.perf_counter()
-
-    caption_result = generate_captions(
-        assets_dir=temp_assets_dir,
-        ocr_results=ocr_results,
-    )
-
-    captions = caption_result["captions"]
-
-    report.captions_generated = caption_result["generated"]
-    report.captions_cached = caption_result["cached"]
-    report.captions_skipped = caption_result["skipped"]
-
-    caption_end = time.perf_counter()
-    caption_time = caption_end - caption_start
-    ui.info(
-        f"Image Captioning Time : {caption_time:.2f} seconds"
+        f"Image Analysis Time : {image_analysis_time:.2f} seconds"
     )
 
     # ----------------------------
@@ -266,8 +242,7 @@ def process_hybrid_pipeline(
     final_markdown = merge_markdown(
         markdown_path=markdown_file,
         assets_dir=temp_assets_dir,
-        ocr_results=ocr_results,
-        captions=captions,
+        image_analysis=image_analysis,
         output_path=batch_markdown,
     )
 
@@ -285,10 +260,11 @@ def process_hybrid_pipeline(
     report.analysis_time = analysis_time
     report.chunking_time = chunking_time
     report.parsing_time = parsing_time
-    report.ocr_time = ocr_time
-    report.caption_time = caption_time
+    report.image_analysis_time = image_analysis_time
     report.merge_time = merge_time
     report.total_time = pipeline_end - pipeline_start
+
+    analysis_times = ia_result["analysis_times"]
 
     return {
         "markdown": final_markdown,
@@ -297,10 +273,10 @@ def process_hybrid_pipeline(
             "analysis": analysis_time,
             "chunking": chunking_time,
             "parsing": parsing_time,
-            "ocr": ocr_time,
-            "caption": caption_time,
+            "image_analysis": image_analysis_time,
             "merge": merge_time,
             "total": pipeline_end - pipeline_start,
         },
-        "report": report
+        "report": report,
+        "analysis_times": analysis_times,
     } 

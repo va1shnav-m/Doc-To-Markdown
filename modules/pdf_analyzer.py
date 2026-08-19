@@ -136,6 +136,8 @@ def detect_table_structure(page):
     Detects:
     - Borderless tables (aligned text columns)
     - Ruled tables (horizontal/vertical vector lines)
+    - Rectangle-based tables (cell borders drawn as rects)
+    - PyMuPDF built-in table finder (fallback)
     """
 
     # ----------------------------
@@ -144,6 +146,7 @@ def detect_table_structure(page):
 
     horizontal_lines = 0
     vertical_lines = 0
+    rect_count = 0
 
     try:
         drawings = page.get_drawings()
@@ -166,6 +169,10 @@ def detect_table_structure(page):
                     elif abs(p1.x - p2.x) < 2 and abs(p1.y - p2.y) > 30:
                         vertical_lines += 1
 
+                # Rectangle (table cells often drawn as rects)
+                elif item[0] == "re":
+                    rect_count += 1
+
     except Exception:
         pass
 
@@ -184,6 +191,28 @@ def detect_table_structure(page):
     # Mixed borders
     if horizontal_lines >= 2 and vertical_lines >= 2:
         return True
+
+    # --------------------------------
+    # Rectangle-based table detection
+    # --------------------------------
+
+    # Many small rectangles typically indicate table cells
+    if rect_count >= 10:
+        return True
+
+    # ----------------------------
+    # Built-in table finder
+    # ----------------------------
+
+    try:
+        tables = page.find_tables()
+        if tables.tables:
+            for table in tables.tables:
+                # Only count tables with at least 2 rows and 2 cols
+                if table.row_count >= 2 and table.col_count >= 2:
+                    return True
+    except Exception:
+        pass
 
     # ----------------------------
     # Borderless table detection
