@@ -44,24 +44,14 @@ class Benchmark:
     images_skipped: int = 0
 
     # ----------------------------------------
-    # OCR
+    # Image Analysis (Unified)
     # ----------------------------------------
 
-    ocr_images: int = 0
-    ocr_success: int = 0
-    ocr_failed: int = 0
-    ocr_characters: int = 0
+    images_analyzed: int = 0
+    images_cached: int = 0
+    images_failed: int = 0
 
-    # ----------------------------------------
-    # Captions
-    # ----------------------------------------
-
-    caption_images: int = 0
-    caption_success: int = 0
-    caption_failed: int = 0
-    caption_skipped: int = 0
-
-    caption_times: Dict[str, float] = field(
+    analysis_times: Dict[str, float] = field(
         default_factory=dict
     )
 
@@ -71,16 +61,6 @@ class Benchmark:
 
     tables_detected: int = 0
     tables_processed: int = 0
-
-    # ----------------------------------------
-    # Cache
-    # ----------------------------------------
-
-    ocr_cache_hits: int = 0
-    ocr_cache_misses: int = 0
-
-    caption_cache_hits: int = 0
-    caption_cache_misses: int = 0
 
     # ----------------------------------------
     # Errors

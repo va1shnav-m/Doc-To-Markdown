@@ -1,21 +1,67 @@
 from .benchmark import Benchmark
 
 
+def _stage_rows(stage_times):
+    """Build HTML table rows for pipeline stages."""
+    rows = []
+    for stage, duration in stage_times.items():
+        label = stage.replace("_", " ").title()
+        rows.append(
+            f"<tr><td>{label}</td>"
+            f"<td>{duration:.2f}</td></tr>"
+        )
+    return "\n".join(rows)
+
+
+def _stage_pct_rows(stage_times, stage_percentages):
+    """Build HTML table rows with percentage column."""
+    rows = []
+    for stage, duration in stage_times.items():
+        label = stage.replace("_", " ").title()
+        pct = stage_percentages.get(stage, 0)
+        rows.append(
+            f"<tr><td>{label}</td>"
+            f"<td>{duration:.2f}</td>"
+            f"<td>{pct:.2f}%</td></tr>"
+        )
+    return "\n".join(rows)
+
+
+def _analysis_time_rows(analysis_times):
+    """Build HTML table rows for per-image analysis timing."""
+    rows = []
+    for image_name, duration in analysis_times.items():
+        rows.append(
+            f"<tr><td>{image_name}</td>"
+            f"<td>{duration:.2f}</td></tr>"
+        )
+    return "\n".join(rows)
+
+
+def _error_section(errors):
+    """Build HTML for the errors section."""
+    if not errors:
+        return "<p>No errors reported.</p>"
+
+    items = "".join(f"<li>{error}</li>" for error in errors)
+    return f"<ul>{items}</ul>"
+
+
 def generate_benchmark_report(benchmark: Benchmark) -> str:
     """
     Generate an HTML benchmark report for one document.
     """
 
-    caption_times = list(benchmark.caption_times.values())
+    analysis_times = list(benchmark.analysis_times.values())
 
-    if caption_times:
-        caption_avg = sum(caption_times) / len(caption_times)
-        caption_min = min(caption_times)
-        caption_max = max(caption_times)
+    if analysis_times:
+        analysis_avg = sum(analysis_times) / len(analysis_times)
+        analysis_min = min(analysis_times)
+        analysis_max = max(analysis_times)
     else:
-        caption_avg = 0
-        caption_min = 0
-        caption_max = 0
+        analysis_avg = 0
+        analysis_min = 0
+        analysis_max = 0
 
     stage_percentages = {}
 
@@ -24,6 +70,13 @@ def generate_benchmark_report(benchmark: Benchmark) -> str:
             stage_percentages[stage] = (
                 duration / benchmark.total_time
             ) * 100
+
+    stages_html = _stage_rows(benchmark.stage_times)
+    analysis_html = _analysis_time_rows(benchmark.analysis_times)
+    distribution_html = _stage_pct_rows(
+        benchmark.stage_times, stage_percentages
+    )
+    errors_html = _error_section(benchmark.errors)
 
     return f"""
     <!DOCTYPE html>
@@ -57,19 +110,7 @@ def generate_benchmark_report(benchmark: Benchmark) -> str:
                 <th>Stage</th>
                 <th>Time (seconds)</th>
             </tr>
-
-            {
-                "".join(
-                    f"""
-                    <tr>
-                        <td>{stage.replace("_", " ").title()}</td>
-                        <td>{duration:.2f}</td>
-                    </tr>
-                    """
-                    for stage, duration in benchmark.stage_times.items()
-                )
-            }
-
+            {stages_html}
         </table>
 
         <h2>Image Statistics</h2>
@@ -96,7 +137,7 @@ def generate_benchmark_report(benchmark: Benchmark) -> str:
             </tr>
         </table>
 
-        <h2>OCR Statistics</h2>
+        <h2>Image Analysis Statistics</h2>
 
         <table border="1" cellpadding="6" cellspacing="0">
             <tr>
@@ -105,13 +146,13 @@ def generate_benchmark_report(benchmark: Benchmark) -> str:
             </tr>
 
             <tr>
-                <td>Images Processed by OCR</td>
-                <td>{benchmark.ocr_images}</td>
+                <td>Images Analyzed</td>
+                <td>{benchmark.images_analyzed}</td>
             </tr>
 
             <tr>
-                <td>OCR Cache Hits</td>
-                <td>{benchmark.ocr_cache_hits}</td>
+                <td>Images from Cache</td>
+                <td>{benchmark.images_cached}</td>
             </tr>
 
             <tr>
@@ -120,74 +161,22 @@ def generate_benchmark_report(benchmark: Benchmark) -> str:
             </tr>
 
             <tr>
-                <td>OCR Failures</td>
-                <td>{benchmark.ocr_failed}</td>
-            </tr>
-
-            <tr>
-                <td>Characters Extracted</td>
-                <td>{benchmark.ocr_characters:,}</td>
+                <td>Analysis Failures</td>
+                <td>{benchmark.images_failed}</td>
             </tr>
         </table>
 
-        <h2>Captioning Statistics</h2>
-
-        <table border="1" cellpadding="6" cellspacing="0">
-            <tr>
-                <th>Metric</th>
-                <th>Count</th>
-            </tr>
-
-            <tr>
-                <td>Images Requiring Captioning</td>
-                <td>{benchmark.caption_images}</td>
-            </tr>
-
-            <tr>
-                <td>Captions Generated</td>
-                <td>{benchmark.caption_success}</td>
-            </tr>
-
-            <tr>
-                <td>Captions from Cache</td>
-                <td>{benchmark.caption_cache_hits}</td>
-            </tr>
-
-            <tr>
-                <td>Captions Skipped</td>
-                <td>{benchmark.caption_skipped}</td>
-            </tr>
-
-            <tr>
-                <td>Caption Failures</td>
-                <td>{benchmark.caption_failed}</td>
-            </tr>
-        </table>
-
-        <h2>Per-Image Caption Timing</h2>
+        <h2>Per-Image Analysis Timing</h2>
 
         <table border="1" cellpadding="6" cellspacing="0">
             <tr>
                 <th>Image</th>
-                <th>Caption Time (seconds)</th>
+                <th>Analysis Time (seconds)</th>
             </tr>
-
-            {
-                "".join(
-                    f"""
-                    <tr>
-                        <td>{image_name}</td>
-                        <td>{duration:.2f}</td>
-                    </tr>
-                    """
-                    for image_name, duration
-                    in benchmark.caption_times.items()
-                )
-            }
-
+            {analysis_html}
         </table>
 
-        <h2>Caption Timing Summary</h2>
+        <h2>Analysis Timing Summary</h2>
 
         <table border="1" cellpadding="6" cellspacing="0">
             <tr>
@@ -196,18 +185,18 @@ def generate_benchmark_report(benchmark: Benchmark) -> str:
             </tr>
 
             <tr>
-                <td>Average Caption Time</td>
-                <td>{caption_avg:.2f}</td>
+                <td>Average Analysis Time</td>
+                <td>{analysis_avg:.2f}</td>
             </tr>
 
             <tr>
-                <td>Fastest Caption</td>
-                <td>{caption_min:.2f}</td>
+                <td>Fastest Analysis</td>
+                <td>{analysis_min:.2f}</td>
             </tr>
 
             <tr>
-                <td>Slowest Caption</td>
-                <td>{caption_max:.2f}</td>
+                <td>Slowest Analysis</td>
+                <td>{analysis_max:.2f}</td>
             </tr>
         </table>
 
@@ -219,44 +208,13 @@ def generate_benchmark_report(benchmark: Benchmark) -> str:
                 <th>Time (seconds)</th>
                 <th>Percentage of Total</th>
             </tr>
-
-            {
-                "".join(
-                    f"""
-                    <tr>
-                        <td>{stage.replace("_", " ").title()}</td>
-                        <td>{duration:.2f}</td>
-                        <td>{stage_percentages.get(stage, 0):.2f}%</td>
-                    </tr>
-                    """
-                    for stage, duration in benchmark.stage_times.items()
-                )
-            }
-
+            {distribution_html}
         </table>
 
         <h2>Errors and Failures</h2>
 
-        {
-            (
-                "<p>No errors reported.</p>"
-                if not benchmark.errors
-                else
-                """
-                <ul>
-                """
-                + "".join(
-                    f"<li>{error}</li>"
-                    for error in benchmark.errors
-                )
-                + """
-                </ul>
-                """
-            )
-        }
-
+        {errors_html}
 
     </body>
     </html>
     """
-

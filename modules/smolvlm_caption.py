@@ -96,45 +96,53 @@ def resize_image(image_path):
 def generate_captions(assets_dir, ocr_results):
 
     prompt = """
-You are an image captioning component in a document parsing system.
+You are an OCR system.
 
-Describe ONLY what is clearly visible in the image in 1-2 concise sentences.
+Your task is to extract all visible text from the provided image in the correct order.
 
-First identify the type of visual content when possible:
-photograph, diagram, chart, table, screenshot, technical figure, or illustration.
+No other info should be provided.
 
-Focus on:
-- the main purpose or subject of the image
-- important technical information
-- diagrams, charts, workflows, or relationships
-- important visible text when it helps identify the content
-
-For diagrams and technical figures:
-- identify the overall subject or purpose
-- mention important entities, labels, components, or sections
-- describe major relationships or flow only when clearly visible
-- use visible text as evidence for understanding the figure
-
-For screenshots or interfaces:
-- describe the application/interface and the important visible content
-
-For charts:
-- describe the chart type and the main information shown
-- do not invent numerical values or trends that are not clearly visible
-
-For photographs or illustrations:
-- describe the main visible subjects and actions
-
-IMPORTANT:
-- Do not infer a scene from individual words.
-- Do not invent objects, people, locations, actions, or events.
-- Do not turn technical diagrams into real-world scenes.
-- If the image is a database/schema diagram, describe it as a database/schema diagram.
-- If the content is unclear, give a conservative description rather than guessing.
-- Do not describe colors, style, or appearance unless important.
-
-Return ONLY the caption.
 """
+#     prompt = """
+# You are an image captioning component in a document parsing system.
+
+# Describe ONLY what is clearly visible in the image in 1-2 concise sentences.
+
+# First identify the type of visual content when possible:
+# photograph, diagram, chart, table, screenshot, technical figure, or illustration.
+
+# Focus on:
+# - the main purpose or subject of the image
+# - important technical information
+# - diagrams, charts, workflows, or relationships
+# - important visible text when it helps identify the content
+
+# For diagrams and technical figures:
+# - identify the overall subject or purpose
+# - mention important entities, labels, components, or sections
+# - describe major relationships or flow only when clearly visible
+# - use visible text as evidence for understanding the figure
+
+# For screenshots or interfaces:
+# - describe the application/interface and the important visible content
+
+# For charts:
+# - describe the chart type and the main information shown
+# - do not invent numerical values or trends that are not clearly visible
+
+# For photographs or illustrations:
+# - describe the main visible subjects and actions
+
+# IMPORTANT:
+# - Do not infer a scene from individual words.
+# - Do not invent objects, people, locations, actions, or events.
+# - Do not turn technical diagrams into real-world scenes.
+# - If the image is a database/schema diagram, describe it as a database/schema diagram.
+# - If the content is unclear, give a conservative description rather than guessing.
+# - Do not describe colors, style, or appearance unless important.
+
+# Return ONLY the caption.
+# """
 
 
 #     prompt = """
@@ -291,24 +299,26 @@ Return ONLY the caption.
 
             response = ollama.chat(
 
-                #model="qwen2.5vl:3b",
+                model="qwen3-vl:2b",
                 # model="ahmadwaqar/smolvlm2-2.2b-instruct:latest",
                 # model="richardyoung/smolvlm2-2.2b-instruct:q4_k_m",
-                model="ahmadwaqar/smolvlm2-500m-video",
+                # model="ahmadwaqar/smolvlm2-500m-video",
+                # model="AuditAid/PaddleOCR-VL-1.6-0.9B:latest",
+
 
                 messages=[
                     {
                         "role": "user",
                         "content": prompt,
-                        "images": [resized]
+                         "images": [resized]
                     }
                 ],
 
                 options={
                     "temperature": 0,
                     "top_p": 0.9,
-                    "repeat_penalty": 1.2,
-                    "num_predict": 150,
+                    "repeat_penalty": 1.05,
+                    
                 }
             )
 

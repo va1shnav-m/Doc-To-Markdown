@@ -4,15 +4,11 @@ from pathlib import Path
 def merge_markdown(
     markdown_path,
     assets_dir,
-    ocr_results,
-    captions,
+    image_analysis,
     output_path=None,
 ):
     """
-    Merge Docling Markdown with:
-    - image references
-    - image captions
-    - OCR text
+    Merge Docling Markdown with structured image analysis.
 
     Parameters
     ----------
@@ -20,9 +16,14 @@ def merge_markdown(
 
     assets_dir : str | Path
 
-    ocr_results : dict
-
-    captions : dict
+    image_analysis : dict
+        {
+            "image_name.png": {
+                "type": "diagram",
+                "markdown": "..."
+            },
+            ...
+        }
 
     output_path : str | Path | None
 
@@ -51,13 +52,6 @@ def merge_markdown(
         *assets_dir.glob("*.webp"),
     ]
 )
-    # print("\n===== Images seen by merge =====")
-
-    # for image in image_files:
-    #     print(image.name)
-
-    # print("===============================\n")
-    
 
     figure_number = 1
 
@@ -68,27 +62,7 @@ def merge_markdown(
 
         image_name = image_path.name
 
-        caption = captions.get(image_name, "").strip()
-
-        ocr = ocr_results.get(
-            image_name,
-            {
-                "text": ""
-            }
-        )
-
-        ocr_text = ocr["text"].strip()
-
-        # Skip images with no useful information
-        if not caption and not ocr_text:
-
-            markdown = markdown.replace(
-                "<!-- image -->",
-                "",
-                1
-            )
-
-            continue
+        analysis = image_analysis.get(image_name)
 
         replacement = []
 
@@ -98,28 +72,20 @@ def merge_markdown(
         replacement.append(
             f"![{image_name}](../temp_assets/{image_name})"
         )
-        if caption:
-
-            replacement.append("")
-            replacement.append("> **Image Description**")
-            replacement.append(">")
-            replacement.append(f"> {caption}")
-
-        if ocr_text:
-
-            replacement.append("")
-            replacement.append("> **OCR Extract**")
-            replacement.append(">")
-
-            for line in ocr_text.splitlines():
-                replacement.append(f"> {line}")
 
         replacement.append("")
 
-    #     print(
-    #     f"Merging image: {image_name}"
-    # )
-        
+        # Add structured analysis if available
+        analysis_markdown = (
+            analysis.get("markdown", "").strip()
+            if analysis else ""
+        )
+
+        if analysis_markdown:
+            for line in analysis_markdown.splitlines():
+                replacement.append(f"> {line}")
+            replacement.append("")
+
         markdown = markdown.replace(
             "<!-- image -->",
             "\n".join(replacement),
