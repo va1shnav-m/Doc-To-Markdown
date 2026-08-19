@@ -1,4 +1,4 @@
-<![CDATA[<div align="center">
+<div align="center">
 
 # 📄 Doc-To-Markdown
 
@@ -292,4 +292,4 @@ This project is licensed under the **MIT License** — see the [LICENSE](LICENSE
 Made with ❤️ by [va1shnav-m](https://github.com/va1shnav-m)
 
 </div>
-]]>
+
