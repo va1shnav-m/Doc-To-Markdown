@@ -15,7 +15,7 @@ Convert **PDF**, **DOC**, and **DOCX** files into clean, structured Markdown —
 
 ---
 
-## ✨ Features
+## Features
 
 - **Multi-format support** — PDF, DOC, and DOCX input files
 - **Hybrid parsing pipeline** — Intelligently routes pages to Docling (complex pages with tables/images) or PyMuPDF (standard text pages) for optimal speed and accuracy
@@ -30,7 +30,7 @@ Convert **PDF**, **DOC**, and **DOCX** files into clean, structured Markdown —
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ### Hybrid Pipeline (PDF)
 
@@ -74,7 +74,7 @@ DOCX ─────────────────────────
 
 ---
 
-## 📋 Prerequisites
+## Prerequisites
 
 | Requirement | Purpose |
 |---|---|
@@ -85,7 +85,7 @@ DOCX ─────────────────────────
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### 1. Clone the repository
 
@@ -128,7 +128,7 @@ python main.py convert ./input --out ./output
 
 ---
 
-## 💻 Usage
+## Usage
 
 ### CLI
 
@@ -164,7 +164,7 @@ python main.py convert ./input --out ./output --force
 
 ---
 
-## 🐳 Docker
+## Docker
 
 ### Build and run with Docker Compose
 
@@ -183,7 +183,7 @@ docker run -p 8501:8501 hybrid-document-parser
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 hybrid-document-parser/
@@ -229,7 +229,7 @@ hybrid-document-parser/
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Component | Technology | Purpose |
 |---|---|---|
@@ -244,7 +244,7 @@ hybrid-document-parser/
 
 ---
 
-## ⚙️ CI/CD
+## CI/CD
 
 The project uses **GitHub Actions** for continuous integration:
 
@@ -256,7 +256,7 @@ Triggers on pushes and pull requests to `main`.
 
 ---
 
-## 📊 Benchmark Reports
+## Benchmark Reports
 
 Each document conversion generates an HTML benchmark report containing:
 
@@ -269,7 +269,7 @@ Reports are saved alongside the output markdown in the output directory.
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Here's how to get started:
 
@@ -281,7 +281,7 @@ Contributions are welcome! Here's how to get started:
 
 ---
 
-## 📝 License
+## License
 
 This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
 
@@ -289,6 +289,6 @@ This project is licensed under the **MIT License** — see the [LICENSE](LICENSE
 
 <div align="center">
 
-Made with ❤️ by [va1shnav-m](https://github.com/va1shnav-m)
+By [va1shnav-m](https://github.com/va1shnav-m)
 
 </div>
