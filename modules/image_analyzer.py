@@ -14,13 +14,12 @@ from modules.ollama_utils import ensure_ollama_running
 # Configuration
 # ------------------------------------
 
-CACHE_FILE = Path("image_analysis_cache.json")
-
-MAX_IMAGE_SIZE = 1024
-
-PHASH_THRESHOLD = 4
-
-MODEL = "qwen2.5vl:3b"
+from modules.config import (
+    IMAGE_ANALYSIS_CACHE_FILE as CACHE_FILE,
+    MAX_IMAGE_DIMENSION as MAX_IMAGE_SIZE,
+    PHASH_THRESHOLD,
+    VLM_MODEL as MODEL,
+)
 
 # ------------------------------------
 # Prompt

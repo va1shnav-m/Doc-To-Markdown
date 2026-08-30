@@ -2,9 +2,7 @@ from pathlib import Path
 import fitz
 import time
 
-# Images covering more than 10% of the page
-# are considered important.
-IMAGE_AREA_THRESHOLD = 0.10
+from modules.config import IMAGE_AREA_THRESHOLD
 
 
 def analyze_pdf(pdf_path):

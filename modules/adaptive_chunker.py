@@ -1,10 +1,6 @@
 from typing import List, Dict
 
-MAX_CHUNK_SIZE = 10
-
-# Docling is memory-heavy (images, tables, OCR).
-# Smaller chunks prevent bad_alloc crashes.
-MAX_DOCLING_CHUNK_SIZE = 5
+from modules.config import MAX_CHUNK_SIZE, MAX_DOCLING_CHUNK_SIZE
 
 
 def create_execution_plan(analysis: List[Dict]):

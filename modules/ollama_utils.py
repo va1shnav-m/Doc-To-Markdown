@@ -3,8 +3,7 @@ import time
 import requests
 
 
-OLLAMA_URL = "http://127.0.0.1:11434"
-STARTUP_TIMEOUT = 60
+from modules.config import OLLAMA_URL, OLLAMA_STARTUP_TIMEOUT
 
 
 def is_ollama_running():
@@ -29,12 +28,15 @@ def ensure_ollama_running():
     print("Ollama is not running. Starting Ollama...")
 
     try:
-        subprocess.Popen(
-            ["ollama", "serve"],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-            creationflags=subprocess.CREATE_NO_WINDOW,
-        )
+        popen_kwargs = {
+            "stdout": subprocess.DEVNULL,
+            "stderr": subprocess.DEVNULL,
+        }
+        # Only set CREATE_NO_WINDOW on platforms where it exists (Windows)
+        if hasattr(subprocess, "CREATE_NO_WINDOW"):
+            popen_kwargs["creationflags"] = subprocess.CREATE_NO_WINDOW
+
+        subprocess.Popen(["ollama", "serve"], **popen_kwargs)
 
     except Exception as e:
         print(f"Failed to start Ollama: {e}")

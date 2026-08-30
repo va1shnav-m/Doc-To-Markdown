@@ -186,38 +186,55 @@ docker run -p 8501:8501 hybrid-document-parser
 ## Project Structure
 
 ```
-hybrid-document-parser/
+Doc-To-Markdown/
 ├── main.py                  # CLI entry point
 ├── requirements.txt         # Python dependencies
 ├── Dockerfile               # Container image definition
 ├── compose.yml              # Docker Compose configuration
 │
-├── pipelines/
+├── pipelines/               # Conversion pipelines
+│   ├── __init__.py          # Pipeline package exports
 │   ├── hybrid_pipeline.py   # Hybrid (Docling + PyMuPDF) pipeline
 │   └── docling_pipeline.py  # Docling-only pipeline
 │
-├── modules/
-│   ├── pdf_analyzer.py      # Per-page analysis & parser selection
+├── modules/                 # Production parsing & analysis modules
+│   ├── __init__.py          # Package exports
+│   ├── config.py            # Centralized configuration & environment settings
 │   ├── adaptive_chunker.py  # Parser-aware PDF chunking
-│   ├── docling_parser.py    # Docling-based document parser
-│   ├── pymupdf_parser.py    # PyMuPDF-based document parser
-│   ├── document_chunker.py  # Fixed-size PDF chunker
-│   ├── document_processor.py# Document processing utilities
 │   ├── doc_converter.py     # DOC → DOCX via LibreOffice
-│   ├── image_analyzer.py    # VLM-based image analysis
+│   ├── docling_parser.py    # Docling-based document parser
+│   ├── document_chunker.py  # Fixed-size PDF chunker
+│   ├── image_analyzer.py    # VLM-based image analysis (Qwen2.5-VL via Ollama)
 │   ├── image_filter.py      # Image quality & size filter
-│   ├── rapidocr_parser.py   # RapidOCR text extraction
-│   ├── smolvlm_caption.py   # SmolVLM caption generation
-│   ├── ollama_utils.py      # Ollama health check & startup
-│   ├── markdown_merge.py    # Merge image analysis into markdown
 │   ├── markdown_combiner.py # Combine chunk markdowns
+│   ├── markdown_merge.py    # Merge image analysis into markdown
+│   ├── ollama_utils.py      # Ollama health check & startup
+│   ├── pdf_analyzer.py      # Per-page analysis & parser selection
+│   ├── pymupdf_parser.py    # Fast PyMuPDF document parser
 │   ├── reporting.py         # Processing report generation
 │   ├── ui.py                # Console UI helpers
 │   └── utils.py             # General utilities
 │
-├── benchmark/
+├── benchmark/               # Performance benchmarking & reporting
+│   ├── __init__.py          # Benchmark package exports
 │   ├── benchmark.py         # Benchmark data model
 │   └── report_generator.py  # HTML benchmark report generator
+│
+├── tests/                   # Automated unit test suite
+│   ├── __init__.py
+│   ├── test_adaptive_chunker.py  # Tests for adaptive chunk planning
+│   ├── test_image_filter.py      # Tests for image filtering rules
+│   ├── test_markdown_combiner.py # Tests for markdown combining
+│   └── test_benchmark.py         # Tests for benchmark metrics & HTML output
+│
+├── experiments/             # Research prototypes, model tests & legacy modules
+│   ├── README.md            # Documentation of experimental scripts
+│   ├── legacy_modules/      # Archived pre-VLM OCR modules (rapidocr, smolvlm, etc.)
+│   ├── test_captionllm.py   # SmolVLM test bench
+│   ├── test_florence.py     # Florence-2 test bench
+│   ├── test_paddleocr.py    # PaddleOCR test bench
+│   ├── test_ppstructure.py  # PPStructureV3 test bench
+│   └── test_rec_boxes.py    # Spatial OCR box clustering prototype
 │
 ├── docs/
 │   └── deployment.md        # Deployment guide

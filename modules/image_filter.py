@@ -1,11 +1,12 @@
 from pathlib import Path
 from PIL import Image
 
-MIN_WIDTH = 180
-MIN_HEIGHT = 180
-
-MIN_SIDE = 32              # Skip if one side is extremely small
-MAX_ASPECT_RATIO = 15      # Skip very long/thin images
+from modules.config import (
+    MIN_IMAGE_WIDTH as MIN_WIDTH,
+    MIN_IMAGE_HEIGHT as MIN_HEIGHT,
+    MIN_IMAGE_SIDE as MIN_SIDE,
+    MAX_ASPECT_RATIO,
+)
 
 MIN_OCR_CHARACTERS = 15
 

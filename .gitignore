@@ -26,14 +26,14 @@ temp/
 temp_chunks/
 tmp/
 temp_assets/
-test_pymupdf4llm.py
-test_output
-
+test_output/
+experiments/**/test_output/
 
 # Generated output
 assets/
 output/
 caption_cache.json
+image_analysis_cache.json
 
 # OS files
 .DS_Store

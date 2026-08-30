@@ -21,6 +21,7 @@ def process_hybrid_pipeline(
     temp_chunks_dir,
     document_index,
     ui=None,
+    skip_analysis: bool = False,
 ):
     
     pipeline_start = time.perf_counter()
@@ -209,25 +210,33 @@ def process_hybrid_pipeline(
 
     ui.subheader("Image Analysis")
 
-    ia_start = time.perf_counter()
+    if skip_analysis:
+        ui.info("Image analysis skipped (--no-analysis).")
+        image_analysis = {}
+        analysis_times = {}
+        report.images_skipped = total_images
+    else:
+        ia_start = time.perf_counter()
 
-    ia_result = analyze_images(
-        temp_assets_dir
-    )
+        ia_result = analyze_images(
+            temp_assets_dir
+        )
 
-    image_analysis = ia_result["results"]
+        image_analysis = ia_result["results"]
 
-    report.images_analyzed = ia_result["generated"]
-    report.images_cached = ia_result["cached"]
-    report.images_skipped = ia_result["skipped"]
-    report.images_failed = ia_result["failed"]
+        report.images_analyzed = ia_result["generated"]
+        report.images_cached = ia_result["cached"]
+        report.images_skipped = ia_result["skipped"]
+        report.images_failed = ia_result["failed"]
 
-    ia_end = time.perf_counter()
-    image_analysis_time = ia_end - ia_start
+        ia_end = time.perf_counter()
+        image_analysis_time = ia_end - ia_start
 
-    ui.info(
-        f"Image Analysis Time : {image_analysis_time:.2f} seconds"
-    )
+        analysis_times = ia_result["analysis_times"]
+
+        ui.info(
+            f"Image Analysis Time : {image_analysis_time:.2f} seconds"
+        )
 
     # ----------------------------
     # Markdown Merge

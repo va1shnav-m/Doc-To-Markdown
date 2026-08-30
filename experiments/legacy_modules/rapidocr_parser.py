@@ -1,13 +1,13 @@
 from pathlib import Path
 
 from rapidocr_onnxruntime import RapidOCR
-from modules.ocr_cache import (
+from .ocr_cache import (
     load_cache,
     save_cache,
 )
 from modules.image_filter import should_process
 
-from modules.smolvlm_caption import (
+from .smolvlm_caption import (
     image_hash,
     find_similar_hash,
 )

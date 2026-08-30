@@ -176,6 +176,14 @@ def run_convert(args):
                 convert_doc(document)
             )
 
+        # Check if output already exists and force is not set
+        expected_output = output_folder / f"document_{index:04d}.md"
+        if not args.force and expected_output.exists():
+            ui.info(
+                f"Skipping {document.name}: Output already exists ({expected_output.name}). Use --force to overwrite."
+            )
+            continue
+
         # Run pipeline
         try:
 
@@ -188,6 +196,7 @@ def run_convert(args):
                     temp_chunks_dir=temp_chunks_dir,
                     document_index=index,
                     ui=ui,
+                    skip_analysis=args.no_analysis,
                 )
 
             else:
@@ -199,6 +208,7 @@ def run_convert(args):
                     temp_chunks_dir=temp_chunks_dir,
                     document_index=index,
                     ui=ui,
+                    skip_analysis=args.no_analysis,
                 )
 
             final_markdown = result["markdown"]
